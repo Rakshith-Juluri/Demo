@@ -1,0 +1,141 @@
+/* ✅ Scoped wrapper for Registration module */
+.cust-reg-page {
+  --primary: #2563EB;
+  --primary-dark: #1E40AF;
+  --primary-light: #EFF6FF;
+  --bg-page: linear-gradient(135deg, #F0F9FF 0%, #DBEAFE 100%);
+  --bg-card: #FFFFFF;
+  --text-main: #1E3A8A;
+  --text-secondary: #64748B;
+  --border: #BFDBFE;
+  --radius: 20px;
+  --shadow: 0 6px 12px -2px rgba(37, 99, 235, 0.15),
+             0 4px 8px -2px rgba(37, 99, 235, 0.1);
+  --btn-save-bg: #2563EB;
+  --btn-save-hover: #1E40AF;
+
+  height: 100vh;
+  width: 100vw;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: var(--bg-page);
+  font-family: 'Inter', -apple-system, sans-serif;
+  color: var(--text-main);
+}
+
+/* Wrapper layout */
+.cust-reg-wrapper {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  gap: 150px;
+  height: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0;
+}
+
+/* Card container */
+.cust-reg-card {
+  flex: 0 0 420px;
+  background-color: var(--bg-card);
+  padding: 25px;
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  box-shadow: 
+    0 6px 12px rgba(0, 0, 0, 0.2),
+    0 12px 24px rgba(0, 0, 0, 0.25);
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+/* Animation container */
+.cust-reg-animation {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Headings */
+.cust-reg-card h2 {
+  margin-bottom: 20px;
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: var(--primary-dark);
+}
+
+/* Form elements */
+.cust-reg-form label {
+  display: block;
+  margin-top: 10px;
+  font-weight: 600;
+  color: var(--text-main);
+}
+
+.cust-reg-form input {
+  width: 94%;
+  padding: 12px;
+  margin-top: 5px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  font-size: 0.9rem;
+  color: var(--text-main);
+  background-color: white;
+  transition: all 0.2s;
+}
+
+.cust-reg-form input:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+}
+
+/* Buttons */
+.cust-reg-btn {
+  background-color: var(--btn-save-bg);
+  color: white;
+  padding: 12px;
+  border: none;
+  width: 100%;
+  border-radius: 10px;
+  margin-top: 20px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.2s;
+}
+
+.cust-reg-btn:hover {
+  background-color: var(--btn-save-hover);
+}
+
+/* Strength indicator */
+.cust-reg-strength {
+  font-size: 0.85rem;
+  margin-top: 10px;
+  color: var(--text-secondary);
+}
+
+/* Confirmation message */
+.cust-reg-confirmation {
+  font-size: 0.9rem;
+  margin-top: 15px;
+  color: var(--btn-save-hover);
+  font-weight: 600;
+}
+
+/* Link button */
+.cust-reg-link {
+  display: block;
+  margin-top: 20px;
+  text-align: center;
+  color: var(--primary);
+  text-decoration: underline;
+  font-weight: 600;
+}
+.error {
+  color: red;
+  font-size: 0.9rem;
+  margin-top: 4px;
+}

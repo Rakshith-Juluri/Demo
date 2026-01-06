@@ -1,0 +1,11 @@
+.x-small {
+  font-size: 0.75rem;
+}
+.uppercase {
+  text-transform: uppercase;
+  letter-spacing: 0.05rem;
+}
+code {
+  font-family: 'Courier New', monospace;
+  font-size: 0.85rem;
+}

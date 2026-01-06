@@ -1,0 +1,180 @@
+{
+  "users": [
+    {
+      "id": "89e1",
+      "name": "Jayanth Kota",
+      "email": "Jayanth1@gmail.com",
+      "mobile": "8092382093",
+      "username": "Jay123",
+      "password": "Jayanth@345",
+      "cibilScore": 785,
+      "healthStatus": "Excellent",
+      "balance": 82000,
+      "loans": [
+        {
+          "id": "LN-HOME-89e1",
+          "category": "HOME",
+          "principal": 4500000,
+          "paidAmount": 1250000,
+          "monthlyEmi": 38500,
+          "tenureRemaining": 182,
+          "interest": "8.25%",
+          "nextDue": "05 Jan 2026",
+          "status": "ACTIVE",
+          "progress": 35,
+          "history": [
+            { "date": "Dec 05", "amt": "38,500", "type": "Principal: ₹12,400 | Int: ₹26,100" },
+            { "date": "Nov 05", "amt": "38,500", "type": "Principal: ₹12,300 | Int: ₹26,200" }
+          ]
+        }
+      ],
+      "accountRequests": [
+        {
+          "requestId": "1766294265338",
+          "status": "approved",
+          "accountType": "current",
+          "accountData": { "customerName": "Jayanth Kota", "panCard": "QWSED1234S" }
+        }
+      ]
+    },
+    {
+      "id": "90f2",
+      "name": "Ananya Sharma",
+      "email": "ananya.sharma@gmail.com",
+      "mobile": "9876543210",
+      "username": "AnanyaS",
+      "password": "Ananya@123",
+      "cibilScore": 710,
+      "healthStatus": "Good",
+      "balance": 125000,
+      "loans": [
+        {
+          "id": "LN-PERS-90f2",
+          "category": "PERSONAL",
+          "principal": 250000,
+          "paidAmount": 85000,
+          "monthlyEmi": 12400,
+          "tenureRemaining": 14,
+          "interest": "11.0%",
+          "nextDue": "12 Jan 2026",
+          "status": "ACTIVE",
+          "progress": 62,
+          "history": [
+            { "date": "Dec 12", "amt": "12,400", "type": "Principal: ₹8,100 | Int: ₹4,300" }
+          ]
+        }
+      ],
+      "accountRequests": [
+        {
+          "requestId": "1766294265340",
+          "status": "approved",
+          "accountType": "savings"
+        }
+      ]
+    },
+    {
+      "id": "91g3",
+      "name": "Rahul Verma",
+      "email": "rahul.verma@yahoo.com",
+      "mobile": "9123456780",
+      "username": "RahulV",
+      "password": "Rahul@789",
+      "cibilScore": 650,
+      "healthStatus": "Average",
+      "balance": 0,
+      "loans": [],
+      "accountRequests": [
+        {
+          "requestId": "1766294265341",
+          "status": "approved",
+          "accountType": "current"
+        }
+      ]
+    }
+  ],
+  "accounts": [
+    {
+      "id": "ACC001",
+      "displayName": "Savings ****1234",
+      "balance": 3242618.75,
+      "currency": "₹",
+      "customerId": "89e1",
+      "status": "ACTIVE"
+    },
+    {
+      "id": "ACC002",
+      "displayName": "Salary ****9876",
+      "balance": 19968,
+      "currency": "₹",
+      "customerId": "89e1",
+      "status": "ACTIVE"
+    }
+  ],
+  "beneficiaries": [
+    {
+      "id": "BEN001",
+      "customerId": "89e1",
+      "name": "Rahul Sharma",
+      "bank": "HDFC Bank",
+      "accountNumber": "123456789012",
+      "ifsc": "HDFC0001234",
+      "nickname": "Rahul-HDFC",
+      "verified": true
+    }
+  ],
+  "transactions": [
+    {
+      "id": "1",
+      "accountId": "ACC001",
+      "beneficiaryId": "BEN001",
+      "amount": 1212,
+      "transferType": "IMPS",
+      "status": "SUCCESS",
+      "timestamp": "2025-12-28T16:18:01.956Z",
+      "charges": "₹5.00",
+      "utr": "UTR889690319465"
+    },
+    {
+      "id": "173c",
+      "accountId": "ACC001",
+      "beneficiaryId": "BEN001",
+      "amount": 200000,
+      "transferType": "RTGS",
+      "status": "SCHEDULED",
+      "timestamp": "2025-12-30T12:47:59.191Z",
+      "charges": "₹45.00",
+      "scheduledFor": "2025-12-30T18:19:00.000Z"
+    }
+  ],
+  "applications": [
+    {
+      "id": "SKY-40247",
+      "timestamp": "2026-01-03T06:46:41.689Z",
+      "personalDetails": { "name": "Jayanth", "phone": "7013258867", "pan": "AWSED1234F", "employmentType": "salaried" },
+      "loanDetails": { "loanType": "personal", "income": "30000", "amount": "100000", "tenure": "24", "emi": "4684" },
+      "status": "PENDING APPROVAL"
+    },
+    {
+      "id": "SKY-69110",
+      "timestamp": "2026-01-05T04:42:25.164Z",
+      "personalDetails": { "name": "jayanth", "phone": "9876543210", "pan": "QASSS3345F", "employmentType": "business" },
+      "loanDetails": { "loanType": "home", "income": "26000", "amount": "1000000", "tenure": "359", "emi": "7694" },
+      "status": "PENDING APPROVAL"
+    }
+  ],
+  "admins": [
+    { "id": "1", "username": "admin12", "password": "admin123" }
+  ],
+  "settings": {
+    "limits": {
+      "NEFT": { "min": 1, "max": 200000 },
+      "RTGS": { "min": 200000, "max": 2000000 },
+      "IMPS": { "min": 1, "max": 200000 }
+    },
+    "fees": {
+      "NEFT": "₹2.5–25",
+      "RTGS": "₹25–55",
+      "IMPS": "₹0–25"
+    }
+  }
+}
