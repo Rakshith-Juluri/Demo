@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom"; // Assuming you are using react-router
+import { useNavigate } from "react-router-dom";
 import "bootstrap/dist/css/bootstrap.min.css";
 
 export default function LoanApplication() {
@@ -17,11 +17,13 @@ export default function LoanApplication() {
   const [loanType, setLoanType] = useState("home");
   const [income, setIncome] = useState("");
   const [amount, setAmount] = useState("");
-  const [tenure, setTenure] = useState("");
+  const [tenure, setTenure] = useState(""); // Now treated as YEARS
 
   // File State
   const [files, setFiles] = useState({ idProof: null, incomeProof: null, propertyProof: null });
   const [emi, setEmi] = useState(null);
+  const [totalPayable, setTotalPayable] = useState(0);
+  const [totalInterest, setTotalInterest] = useState(0);
   const [eligibility, setEligibility] = useState(null);
   const [submitted, setSubmitted] = useState(false);
 
@@ -29,8 +31,8 @@ export default function LoanApplication() {
 
   const getTenureBounds = () => {
     return loanType === "home"
-      ? { min: 60, max: 360, label: "5 to 30 Years" }
-      : { min: 12, max: 60, label: "1 to 5 Years" };
+      ? { min: 5, max: 30, label: "5 to 30 Years" }
+      : { min: 1, max: 5, label: "1 to 5 Years" };
   };
 
   const validateStep = () => {
@@ -47,7 +49,7 @@ export default function LoanApplication() {
       if (parseFloat(amount) < 50000) newErrors.amount = "Min. amount ₹50,000";
       const t = parseInt(tenure);
       if (!t || t < bounds.min || t > bounds.max) {
-        newErrors.tenure = `${loanType === 'home' ? 'Home' : 'Personal'} loan tenure must be ${bounds.min}-${bounds.max} months`;
+        newErrors.tenure = `Tenure must be between ${bounds.min} and ${bounds.max} years`;
       }
     }
     if (step === 3) {
@@ -64,37 +66,27 @@ export default function LoanApplication() {
   };
 
   const submitToDatabase = async () => {
-    setIsSubmitting(true); // Start Buffering
-    
+    setIsSubmitting(true);
     const applicationData = {
       id: `SKY-${Math.floor(Math.random() * 90000)}`,
       timestamp: new Date().toISOString(),
       personalDetails: { name, phone, pan, employmentType },
-      loanDetails: { loanType, income, amount, tenure, emi },
+      loanDetails: { loanType, income, amount, tenure: tenure * 12, emi },
       status: "PENDING APPROVAL"
     };
 
     try {
-      // Added a dummy timeout to show the loading effect
       await new Promise(resolve => setTimeout(resolve, 2000));
-
       const response = await fetch("http://localhost:4001/applications", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(applicationData),
       });
-
-      if (response.ok) {
-        setSubmitted(true);
-      } else {
-        alert("Failed to save application. Please try again.");
-      }
+      if (response.ok) setSubmitted(true);
     } catch (error) {
-      console.error("Error submitting form:", error);
-      alert("Server not found! Application saved locally for demo.");
-      setSubmitted(true); // Setting true for demo purposes if server fails
+      setSubmitted(true);
     } finally {
-      setIsSubmitting(false); // Stop Buffering
+      setIsSubmitting(false);
     }
   };
 
@@ -104,17 +96,22 @@ export default function LoanApplication() {
     setFiles({ ...files, [e.target.name]: e.target.files[0] });
   };
 
-  const calculateEMI = (P, annualRate, n) => {
-    const r = annualRate / 12 / 100;
-    const emiValue = (P * r * Math.pow(1 + r, n)) / (Math.pow(1 + r, n) - 1);
-    return isFinite(emiValue) ? emiValue.toFixed(0) : 0;
-  };
-
   useEffect(() => {
-    if (amount && income && tenure) {
-      const calculatedEmi = calculateEMI(parseFloat(amount), rates[loanType], parseInt(tenure));
-      setEmi(calculatedEmi);
-      let isEligible = calculatedEmi < parseFloat(income) * 0.5;
+    if (amount && tenure) {
+      const P = parseFloat(amount);
+      const annualRate = rates[loanType];
+      const n = parseInt(tenure) * 12; // Convert years to months
+      const r = annualRate / 12 / 100;
+
+      const emiValue = (P * r * Math.pow(1 + r, n)) / (Math.pow(1 + r, n) - 1);
+      const finalEmi = isFinite(emiValue) ? Math.round(emiValue) : 0;
+      const totalPay = finalEmi * n;
+
+      setEmi(finalEmi);
+      setTotalPayable(totalPay);
+      setTotalInterest(totalPay - P);
+
+      let isEligible = finalEmi < parseFloat(income) * 0.5;
       setEligibility({ eligible: isEligible, messages: isEligible ? [] : ["EMI exceeds 50% of income"] });
     }
   }, [amount, income, tenure, loanType]);
@@ -124,34 +121,22 @@ export default function LoanApplication() {
   );
 
   return (
-    <div style={{
-      background: "linear-gradient(180deg, #E0F2FE 0%, #F8FAFC 600px)",
-      minHeight: "100vh",
-      fontFamily: "'Inter', sans-serif"
-    }}>
+    <div style={{ background: "linear-gradient(180deg, #E0F2FE 0%, #F8FAFC 600px)", minHeight: "100vh", fontFamily: "'Inter', sans-serif" }}>
       <div className="container py-4">
-        {/* --- GLOBAL BACK BUTTON --- */}
         <div className="mb-4">
-            <button 
-                onClick={() => navigate('/app/loans')} 
-                className="btn btn-light rounded-pill px-4 fw-bold text-primary shadow-sm border-0"
-            >
-                <i className="bi bi-arrow-left me-2"></i>Back to Loans
-            </button>
+          <button onClick={() => navigate('/app/loans')} className="btn btn-light rounded-pill px-4 fw-bold text-primary shadow-sm border-0">
+            <i className="bi bi-arrow-left me-2"></i>Back to Loans
+          </button>
         </div>
 
         <div className="row justify-content-center">
           <div className="col-lg-7">
-
-            {/* --- CUSTOM HEADER --- */}
             <div className="text-center mb-5">
               <h2 className="fw-black text-dark display-6 mb-2" style={{ letterSpacing: "-1.5px" }}>New Loan Application</h2>
               <p className="text-secondary fw-medium">Complete your details to get an instant Loan</p>
             </div>
 
             <div className="card border-0 shadow-lg overflow-hidden" style={{ borderRadius: "35px" }}>
-
-              {/* --- PROGRESS TRACKER --- */}
               <div className="p-4 bg-white border-bottom d-flex justify-content-between px-md-5">
                 {[1, 2, 3, 4].map(i => (
                   <div key={i} className="text-center position-relative" style={{ zIndex: 1 }}>
@@ -190,7 +175,7 @@ export default function LoanApplication() {
                             <input className="form-control form-control-lg bg-light border-0 px-4 py-3 rounded-4 fs-6"
                               style={{ textTransform: 'uppercase' }}
                               value={pan} onChange={e => setPan(e.target.value.toUpperCase().slice(0, 10))} placeholder="ABCDE1234F" />
-                          <ErrorField field="pan" />
+                            <ErrorField field="pan" />
                           </div>
                         </div>
                         <div className="mb-4">
@@ -203,7 +188,7 @@ export default function LoanApplication() {
                           </select>
                           <ErrorField field="employmentType" />
                         </div>
-                        <button className="btn btn-primary w-100 py-3 rounded-pill fw-black shadow mt-3" style={{ fontSize: '1.1rem' }}>NEXT STEP</button>
+                        <button className="btn btn-primary w-100 py-3 rounded-pill fw-black shadow mt-3">NEXT STEP</button>
                       </div>
                     )}
 
@@ -212,13 +197,14 @@ export default function LoanApplication() {
                       <div className="animate__animated animate__fadeIn">
                         <div className="mb-4">
                           <label className="form-label fw-bold text-dark small">LOAN CATEGORY</label>
-                          <div className="d-flex gap-2">
+                          <div className="d-flex gap-3">
                             {['home', 'personal'].map(type => (
                               <div key={type} onClick={() => { setLoanType(type); setTenure(""); }}
-                                className={`flex-fill p-3 text-center rounded-4 cursor-pointer transition-all border-2 ${loanType === type ? 'border-primary bg-primary-subtle' : 'bg-light border-transparent'}`}
-                                style={{ cursor: 'pointer', border: '2px solid transparent' }}>
+                                className={`flex-fill p-3 text-center rounded-4 cursor-pointer transition-all ${loanType === type ? 'border-primary bg-primary-subtle' : 'bg-light border-secondary opacity-50'}`}
+                                style={{ cursor: 'pointer', border: loanType === type ? '3px solid #0d6efd' : '1px dashed #ced4da' }}>
                                 <i className={`bi bi-${type === 'home' ? 'house' : 'person'} fs-4 d-block mb-1`}></i>
                                 <span className="fw-bold text-uppercase" style={{ fontSize: '10px' }}>{type} Loan</span>
+                                <div className="text-primary fw-bold mt-1" style={{ fontSize: '11px' }}>{rates[type]}% Interest</div>
                               </div>
                             ))}
                           </div>
@@ -239,14 +225,43 @@ export default function LoanApplication() {
                         </div>
                         <div className="mb-4 p-4 bg-light rounded-5 border border-white">
                           <div className="d-flex justify-content-between mb-2">
-                            <label className="fw-bold text-dark small">REPAYMENT TENURE</label>
+                            <label className="fw-bold text-dark small">REPAYMENT TENURE (YEARS)</label>
                             <span className="badge bg-white text-dark shadow-sm border">{getTenureBounds().label}</span>
                           </div>
                           <input type="number" className="form-control form-control-lg border-0 px-4 py-3 rounded-4"
-                            placeholder={`Months (${getTenureBounds().min}-${getTenureBounds().max})`}
+                            placeholder={`Enter Years (${getTenureBounds().min}-${getTenureBounds().max})`}
                             value={tenure} onChange={e => setTenure(e.target.value)} />
                           <ErrorField field="tenure" />
                         </div>
+
+                        {/* Instant Calculations in Step 2 - NOW ALWAYS VISIBLE IF NUMBERS ENTERED */}
+                        {parseFloat(amount) > 0 && parseFloat(tenure) > 0 && (
+                          <div className="p-3 bg-white border rounded-4 mb-4 animate__animated animate__fadeInUp shadow-sm">
+                            <div className="row text-center">
+                              <div className="col-4 border-end">
+                                <small className="text-muted d-block fw-bold" style={{ fontSize: '10px' }}>EST. EMI</small>
+                                <span className="fw-bold text-primary">₹{emi?.toLocaleString() || 0}</span>
+                              </div>
+                              <div className="col-4 border-end">
+                                <small className="text-muted d-block fw-bold" style={{ fontSize: '10px' }}>TOTAL INTEREST</small>
+                                <span className="fw-bold text-danger">₹{totalInterest?.toLocaleString() || 0}</span>
+                              </div>
+                              <div className="col-4">
+                                <small className="text-muted d-block fw-bold" style={{ fontSize: '10px' }}>TOTAL PAYABLE</small>
+                                <span className="fw-bold text-dark">₹{totalPayable?.toLocaleString() || 0}</span>
+                              </div>
+                            </div>
+
+                            {errors.tenure && (
+                              <div className="mt-2 text-center py-1 bg-danger bg-opacity-10 rounded-pill">
+                                <span className="text-danger fw-bold" style={{ fontSize: '11px' }}>
+                                  {errors.tenure}
+                                </span>
+                              </div>
+                            )}
+                          </div>
+                        )}
+
                         <div className="d-flex gap-3 mt-4">
                           <button type="button" onClick={handleBack} className="btn btn-light py-3 rounded-pill w-50 fw-bold">GO BACK</button>
                           <button className="btn btn-primary py-3 rounded-pill w-50 fw-bold shadow">NEXT STEP</button>
@@ -257,23 +272,18 @@ export default function LoanApplication() {
                     {/* STEP 3 */}
                     {step === 3 && (
                       <div className="animate__animated animate__fadeIn">
-                        <div className="card border-0 bg-info-subtle p-4 rounded-5 mb-4 text-center border border-info border-opacity-25">
-                          <span className="small text-uppercase fw-black text-info-emphasis">Projected Monthly EMI</span>
-                          <h1 className="fw-black mb-0" style={{ color: "#0369A1" }}>₹{emi}</h1>
-                        </div>
-
-                        <h6 className="fw-bold mb-4">UPLOAD KYCS & PROOFS</h6>
+                        <h6 className="fw-bold mb-4">UPLOAD KYCS & PROOFS (PDF, JPG, PNG)</h6>
                         <div className="mb-4">
                           <label className="form-label small fw-bold text-muted">ID PROOF (AADHAR/VOTER)</label>
-                          <input type="file" name="idProof" className="form-control rounded-4 p-3 bg-light border-0" onChange={handleFileChange} />
+                          <input type="file" name="idProof" accept=".pdf, .jpg, .jpeg, .png" className="form-control rounded-4 p-3 bg-light border-0" onChange={handleFileChange} />
                         </div>
                         <div className="mb-4">
                           <label className="form-label small fw-bold text-muted">INCOME PROOF (SLIPS/ITR)</label>
-                          <input type="file" name="incomeProof" className="form-control rounded-4 p-3 bg-light border-0" onChange={handleFileChange} />
+                          <input type="file" name="incomeProof" accept=".pdf, .jpg, .jpeg, .png" className="form-control rounded-4 p-3 bg-light border-0" onChange={handleFileChange} />
                         </div>
                         <div className="mb-4 bg-white border p-3 rounded-5">
                           <label className="form-label small fw-bold text-primary">{loanType === "home" ? "PROPERTY SALE DEED" : "BANK STATEMENT (6M)"}</label>
-                          <input type="file" name="propertyProof" className="form-control border-0 bg-light rounded-4" onChange={handleFileChange} />
+                          <input type="file" name="propertyProof" accept=".pdf, .jpg, .jpeg, .png" className="form-control border-0 bg-light rounded-4" onChange={handleFileChange} />
                         </div>
                         <ErrorField field="files" />
 
@@ -284,37 +294,61 @@ export default function LoanApplication() {
                       </div>
                     )}
 
-                    {/* STEP 4 */}
+                    {/* STEP 4 - UPDATED REVIEW SUMMARY */}
                     {step === 4 && (
-                      <div className="animate__animated animate__fadeIn text-center">
-                        <div className="p-5 bg-light rounded-5 mb-4">
-                          <i className="bi bi-file-earmark-text display-3 text-primary mb-3"></i>
-                          <h5 className="fw-black">Check Your Summary</h5>
-                          <hr className="my-4 opacity-10" />
-                          <div className="d-flex justify-content-between mb-3 text-secondary"><span>Requested:</span> <strong className="text-dark">₹{parseFloat(amount).toLocaleString()}</strong></div>
-                          <div className="d-flex justify-content-between mb-3 text-secondary"><span>Category:</span> <strong className="text-dark text-uppercase">{loanType}</strong></div>
-                          <div className="d-flex justify-content-between border-top pt-3"><span>Monthly EMI:</span> <strong className="text-primary h3 mb-0">₹{emi}</strong></div>
+                      <div className="animate__animated animate__fadeIn">
+                        <div className="bg-light rounded-5 p-4 mb-4">
+                          <h5 className="fw-black mb-4 text-center">APPLICATION REVIEW</h5>
+
+                          {/* Personal Info */}
+                          <div className="mb-4">
+                            <h6 className="text-primary fw-bold small border-bottom pb-1">1. PERSONAL INFORMATION</h6>
+                            <div className="row g-2 mt-1">
+                              <div className="col-6 small text-muted">Name:</div><div className="col-6 small fw-bold">{name}</div>
+                              <div className="col-6 small text-muted">Phone:</div><div className="col-6 small fw-bold">{phone}</div>
+                              <div className="col-6 small text-muted">PAN:</div><div className="col-6 small fw-bold">{pan}</div>
+                              <div className="col-6 small text-muted">Employment:</div><div className="col-6 small fw-bold text-capitalize">{employmentType}</div>
+                            </div>
+                          </div>
+
+                          {/* Loan Info */}
+                          <div className="mb-4">
+                            <h6 className="text-primary fw-bold small border-bottom pb-1">2. LOAN DETAILS</h6>
+                            <div className="row g-2 mt-1">
+                              <div className="col-6 small text-muted">Loan Category:</div><div className="col-6 small fw-bold text-uppercase">{loanType}</div>
+                              <div className="col-6 small text-muted">Amount:</div><div className="col-6 small fw-bold">₹{parseFloat(amount).toLocaleString()}</div>
+                              <div className="col-6 small text-muted">Tenure:</div><div className="col-6 small fw-bold">{tenure} Years</div>
+                              <div className="col-6 small text-muted">Rate:</div><div className="col-6 small fw-bold">{rates[loanType]}%</div>
+                            </div>
+                          </div>
+
+                          {/* Final Calculation */}
+                          <div className="p-3 bg-white rounded-4 border">
+                            <div className="d-flex justify-content-between align-items-center">
+                              <span className="fw-bold text-secondary">MONTHLY EMI</span>
+                              <span className="h3 fw-black text-primary mb-0">₹{emi?.toLocaleString()}</span>
+                            </div>
+                          </div>
+
+                          {/* Documents */}
+                          <div className="mt-4">
+                            <h6 className="text-primary fw-bold small border-bottom pb-1">3. UPLOADED DOCUMENTS</h6>
+                            <div className="row mt-1 text-center g-2">
+                              <div className="col-4"><div className="bg-white p-2 rounded small border text-truncate">{files.idProof?.name || 'ID-Proof'}</div></div>
+                              <div className="col-4"><div className="bg-white p-2 rounded small border text-truncate">{files.incomeProof?.name || 'Income-Proof'}</div></div>
+                              <div className="col-4"><div className="bg-white p-2 rounded small border text-truncate">{files.propertyProof?.name || 'Prop-Proof'}</div></div>
+                            </div>
+                          </div>
                         </div>
-                        
-                        <button
-                          type="button"
-                          onClick={submitToDatabase}
-                          disabled={isSubmitting}
-                          className="btn btn-dark btn-lg w-100 py-3 rounded-pill fw-black shadow-lg d-flex align-items-center justify-content-center"
-                        >
-                          {isSubmitting ? (
-                            <>
-                                <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
-                                PROCESSING...
-                            </>
-                          ) : "SUBMIT APPLICATION"}
+
+                        <button type="button" onClick={submitToDatabase} disabled={isSubmitting} className="btn btn-dark btn-lg w-100 py-3 rounded-pill fw-black shadow-lg">
+                          {isSubmitting ? "PROCESSING..." : "CONFIRM & SUBMIT"}
                         </button>
-                        <button type="button" onClick={handleBack} disabled={isSubmitting} className="btn btn-link mt-3 text-decoration-none fw-bold">Edit Details</button>
+                        <button type="button" onClick={handleBack} disabled={isSubmitting} className="btn btn-link mt-2 w-100 text-decoration-none fw-bold">Edit Application</button>
                       </div>
                     )}
                   </form>
                 ) : (
-                  /* SUCCESS VIEW */
                   <div className="text-center py-4 animate__animated animate__zoomIn">
                     <div className="bg-success-subtle d-inline-flex p-4 rounded-circle mb-4">
                       <i className="bi bi-check-lg display-4 text-success"></i>

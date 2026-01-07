@@ -31,7 +31,6 @@ const AccountsPage = () => {
         if (res.ok) {
           const allData = await res.json();
           
-          // 1. Filter Approved Accounts
           const approved = allData
             .filter(item => item.status === "approved")
             .map(item => ({
@@ -47,7 +46,6 @@ const AccountsPage = () => {
           
           setAccounts(prev => [...prev.filter(a => a.id === 1), ...approved]);
 
-          // 2. Filter Pending Requests for the tracker
           const pending = allData.filter(item => item.status === "pending");
           setPendingRequests(pending);
         }
@@ -85,7 +83,6 @@ const AccountsPage = () => {
         theme={theme} 
       />
 
-      {/* --- PROFESSIONAL MICRO-DASHBOARD MODAL --- */}
       <Modal 
         show={showStatusTracker} 
         onHide={() => setShowStatusTracker(false)}
@@ -187,20 +184,43 @@ const AccountsPage = () => {
             <div className="col-lg-5">
               <div className="card border-0 shadow-sm rounded-5 p-4 bg-white h-100">
                 <div className="d-flex justify-content-between align-items-center mb-4">
-                  <h5 className="fw-bold mb-0" style={{ color: theme.darkBlue }}>Management</h5>
-                  <div className="form-check form-switch">
-                    <input className="form-check-input" type="checkbox" checked={selectedAccount.status === "Active"} onChange={() => toggleAccountStatus(selectedAccount.id)} />
-                    <label className="form-check-label small fw-bold ms-2">{selectedAccount.status}</label>
-                  </div>
+                  <h5 className="fw-bold mb-0" style={{ color: theme.darkBlue }}>Account Management</h5>
+                  <span className={`badge rounded-pill px-3 py-1 ${selectedAccount.status === "Active" ? "bg-success" : "bg-danger"}`}>
+                    {selectedAccount.status}
+                  </span>
                 </div>
+
                 <div className="bg-light rounded-4 p-3 mb-3">
-                  <small className="text-muted d-block">Branch</small>
+                  <small className="text-muted d-block text-uppercase fw-bold" style={{fontSize: '10px'}}>Branch</small>
                   <span className="fw-bold">{selectedAccount.branch}</span>
                 </div>
-                <div className="bg-light rounded-4 p-3">
-                  <small className="text-muted d-block">IFSC</small>
+                
+                <div className="bg-light rounded-4 p-3 mb-4">
+                  <small className="text-muted d-block text-uppercase fw-bold" style={{fontSize: '10px'}}>IFSC Code</small>
                   <span className="fw-bold">{selectedAccount.ifsc}</span>
                 </div>
+
+                <button 
+                  onClick={() => navigate('/app/accounts/control', { state: { account: selectedAccount } })}
+                  className={`btn w-100 py-3 rounded-pill fw-black shadow-sm d-flex align-items-center justify-content-center gap-2 ${
+                    selectedAccount.status === "Active" ? "btn-outline-danger" : "btn-outline-success"
+                  }`}
+                  style={{ borderWidth: '2px' }}
+                >
+                  {selectedAccount.status === "Active" ? (
+                    <>
+                      <i className="bi bi-snow2"></i> DEACTIVATE ACCOUNT
+                    </>
+                  ) : (
+                    <>
+                      <i className="bi bi-unlock-fill"></i> REACTIVATE ACCOUNT
+                    </>
+                  )}
+                </button>
+                
+                <p className="text-center text-muted small mt-3">
+                  Proceeding will require PAN & OTP verification.
+                </p>
               </div>
             </div>
 
