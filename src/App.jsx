@@ -16,11 +16,13 @@ import LoanPage from './pages/Loan/Loan_page'
 import LoanApplication from './pages/Loan/LoanApplication'
 import AccountsPage from './pages/Accounts/Accounts_page'
 import SavingAccount from './pages/Accounts/SavingAccount'
+import AdminDashboard from './pages/AdminDashboard'
 
 function App() {
   return (
     <BrowserRouter>
       <Routes>
+        <Route path='/admindashboard' element={<AdminDashboard/>}/>
         {/* Entry: Login page as root */}
         <Route path="/" element={<Login />} />
 
