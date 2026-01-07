@@ -13,11 +13,11 @@ export default function Header({ userData }) {
 
   // Define nav items array for easier management
   const navItems = [
-    { path: "/home", label: "HOME" },
-    { path: "/accounts", label: "ACCOUNTS" },
-    { path: "/transactions", label: "TRANSACTIONS" }, // New Section Added
-    { path: "/loans", label: "LOANS" },
-    { path: "/funds", label: "SEND MONEY" }
+    { path: "/app/home", label: "HOME" },
+    { path: "/app/accounts", label: "ACCOUNTS" },
+    { path: "/app/transactions", label: "TRANSACTIONS" }, // New Section Added
+    { path: "/app/loans", label: "LOANS" },
+    { path: "/app/funds", label: "SEND MONEY" }
   ];
 
   return (

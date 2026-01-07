@@ -20,46 +20,57 @@ function Login() {
   };
 
   const Buttontag = async () => {
-    if (isLogin) {
-      if (!username.trim()) { setError("Username is required"); return; }
-      if (!password.trim()) { setError("Password is required"); return; }
-      if (password.length < 8) { setError("Password must be at least 8 characters"); return; }
-    } else {
-      if (!adminUsername.trim()) { setError("Username is required"); return; }
-      if (!adminPassword.trim()) { setError("Password is required"); return; }
-      if (adminPassword.length < 6) { setError("Password must be at least 6 characters"); return; }
-    }
+  // 1. Validation Logic
+  if (isLogin) {
+    if (!username.trim()) { setError("Username is required"); return; }
+    if (!password.trim()) { setError("Password is required"); return; }
+    if (password.length < 8) { setError("Password must be at least 8 characters"); return; }
+  } else {
+    if (!adminUsername.trim()) { setError("Username is required"); return; }
+    if (!adminPassword.trim()) { setError("Password is required"); return; }
+    if (adminPassword.length < 6) { setError("Password must be at least 6 characters"); return; }
+  }
 
-    try {
-      const endpoint = isLogin ? "http://localhost:4001/users" : "http://localhost:4001/admins";
-      const res = await fetch(endpoint);
-      if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
-      const data = await res.json();
+  try {
+    const endpoint = isLogin ? "http://localhost:4001/users" : "http://localhost:4001/admins";
+    const res = await fetch(endpoint);
+    if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
+    const data = await res.json();
 
-      const found = isLogin
-        ? data.find((u) => u.username === username && u.password === password)
-        : data.find((a) => a.username === adminUsername && a.password === adminPassword);
+    // 2. Finding the User/Admin
+    const found = isLogin
+      ? data.find((u) => u.username === username && u.password === password)
+      : data.find((a) => a.username === adminUsername && a.password === adminPassword);
 
-      if (found) {
-        setError("");
-        if (isLogin) {
-          localStorage.setItem('loggedInUser', JSON.stringify({
-            id: found.id,
-            name: found.name,
-            username: found.username || '',
-            mobile: found.mobile || ''
-          }));
-        }
-        // After successful login, navigate to the protected app area (dashboard)
-        navigate('/app');
+    if (found) {
+      setError("");
+      
+      if (isLogin) {
+        // User Login Success
+        localStorage.setItem('loggedInUser', JSON.stringify({
+          id: found.id,
+          name: found.name,
+          username: found.username,
+          role: 'user' // Added role for better route guarding later
+        }));
+        navigate('/app'); 
       } else {
-        setError("The Username or password you entered is wrong. Try again");
+        // Admin Login Success
+        localStorage.setItem('adminSession', JSON.stringify({
+          id: found.id,
+          username: found.username,
+          role: 'admin'
+        }));
+        navigate('/admin-dashboard'); // Redirect to admin-specific path
       }
-    } catch (err) {
-      console.error(err);
-      setError("Server error");
+    } else {
+      setError("The Username or password you entered is wrong. Try again");
     }
-  };
+  } catch (err) {
+    console.error(err);
+    setError("Server error");
+  }
+};
 
   return (
     <div style={{ background: theme.bgGradient, minHeight: "100vh", fontFamily: "'Inter', sans-serif" }} className="d-flex align-items-center">

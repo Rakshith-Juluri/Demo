@@ -133,7 +133,7 @@ export default function LoanApplication() {
         {/* --- GLOBAL BACK BUTTON --- */}
         <div className="mb-4">
             <button 
-                onClick={() => navigate('/loans')} 
+                onClick={() => navigate('/app/loans')} 
                 className="btn btn-light rounded-pill px-4 fw-bold text-primary shadow-sm border-0"
             >
                 <i className="bi bi-arrow-left me-2"></i>Back to Loans
@@ -324,7 +324,7 @@ export default function LoanApplication() {
                     <div className="alert bg-warning bg-opacity-10 border-0 text-dark fw-bold rounded-pill py-3">
                       STATUS: PENDING APPROVAL
                     </div>
-                    <button onClick={() => navigate('/loans')} className="btn btn-outline-dark mt-4 px-5 py-2 rounded-pill fw-bold">RETURN TO HOME</button>
+                    <button onClick={() => navigate('/app/loans')} className="btn btn-outline-dark mt-4 px-5 py-2 rounded-pill fw-bold">RETURN TO HOME</button>
                   </div>
                 )}
               </div>

@@ -126,7 +126,7 @@ export default function SelfTransferAutoOTP({
 
   const handleBack = () => {
     if (onBack) onBack();
-    else if (navigate) navigate('/funds');
+    else if (navigate) navigate('/app/funds');
     else window.history.back();
   };
 
