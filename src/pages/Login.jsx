@@ -61,7 +61,9 @@ function Login() {
           username: found.username,
           role: 'admin'
         }));
-        navigate('/admin-dashboard'); // Redirect to admin-specific path
+        // App routing defines the admin route as '/admindashboard' (see App.jsx),
+        // so navigate there to match the existing route.
+        navigate('/admindashboard'); // Redirect to admin-specific path
       }
     } else {
       setError("The Username or password you entered is wrong. Try again");

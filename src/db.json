@@ -35,17 +35,6 @@
             }
           ]
         }
-      ],
-      "accountRequests": [
-        {
-          "requestId": "1766294265338",
-          "status": "approved",
-          "accountType": "current",
-          "accountData": {
-            "customerName": "Jayanth Kota",
-            "panCard": "QWSED1234S"
-          }
-        }
       ]
     },
     {
@@ -78,14 +67,8 @@
             }
           ]
         }
-      ],
-      "accountRequests": [
-        {
-          "requestId": "1766294265340",
-          "status": "approved",
-          "accountType": "savings"
-        }
       ]
+     
     },
     {
       "id": "91g3",
@@ -97,14 +80,7 @@
       "cibilScore": 650,
       "healthStatus": "Average",
       "balance": 0,
-      "loans": [],
-      "accountRequests": [
-        {
-          "requestId": "1766294265341",
-          "status": "approved",
-          "accountType": "current"
-        }
-      ]
+      "loans": []
     },
     {
       "id": "cfa4",
@@ -117,7 +93,7 @@
     }
   ],
   "accountRequests": [
-    {},
+   
     {
       "id": "5301",
       "requestId": "1767755239602-1",
