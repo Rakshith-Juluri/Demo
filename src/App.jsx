@@ -16,16 +16,16 @@ import LoanPage from './pages/Loan/Loan_page'
 import LoanApplication from './pages/Loan/LoanApplication'
 import AccountsPage from './pages/Accounts/Accounts_page'
 import SavingAccount from './pages/Accounts/SavingAccount'
-import AdminDashboard from './pages/AdminDashboard'
+import AdminDashboard from './pages/Admin/AdminDashboard'
+import ProtectedAdminRoute from './pages/Admin/ProtectedAdminRoute'
 
 function App() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path='/admindashboard' element={<AdminDashboard/>}/>
+  <Route path='/admindashboard' element={<ProtectedAdminRoute><AdminDashboard/></ProtectedAdminRoute>} />
         {/* Entry: Login page as root */}
         <Route path="/" element={<Login />} />
-
         {/* Public routes reachable from Login */}
         <Route path="/register" element={<Registeration />} />
         <Route path="/forget-password" element={<ForgetPassword />} />
@@ -36,6 +36,8 @@ function App() {
         <Route path="/app" element={<MainLayout />}>
           {/* Dashboard as index (home) => /app */}
           <Route index element={<CustomerDashboard />} />
+
+          {/* KYC route removed as requested */}
           {/* Keep /app/home path to match Header links if used */}
           <Route path="home" element={<CustomerDashboard />} />
 
