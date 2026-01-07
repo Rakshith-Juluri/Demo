@@ -15,9 +15,9 @@ export default function Header({ userData }) {
   const navItems = [
     { path: "/app/home", label: "HOME" },
     { path: "/app/accounts", label: "ACCOUNTS" },
-    { path: "/app/transactions", label: "TRANSACTIONS" }, // New Section Added
+    { path: "/app/transactions", label: "HISTORY" }, // New Section Added
     { path: "/app/loans", label: "LOANS" },
-    { path: "/app/funds", label: "SEND MONEY" }
+    { path: "/app/funds", label: "TRANSFER MONEY" }
   ];
 
   return (
