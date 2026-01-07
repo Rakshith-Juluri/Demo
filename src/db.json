@@ -35,17 +35,6 @@
             }
           ]
         }
-      ],
-      "accountRequests": [
-        {
-          "requestId": "1766294265338",
-          "status": "approved",
-          "accountType": "current",
-          "accountData": {
-            "customerName": "Jayanth Kota",
-            "panCard": "QWSED1234S"
-          }
-        }
       ]
     },
     {
@@ -78,13 +67,6 @@
             }
           ]
         }
-      ],
-      "accountRequests": [
-        {
-          "requestId": "1766294265340",
-          "status": "approved",
-          "accountType": "savings"
-        }
       ]
     },
     {
@@ -97,14 +79,7 @@
       "cibilScore": 650,
       "healthStatus": "Average",
       "balance": 0,
-      "loans": [],
-      "accountRequests": [
-        {
-          "requestId": "1766294265341",
-          "status": "approved",
-          "accountType": "current"
-        }
-      ]
+      "loans": []
     },
     {
       "id": "cfa4",
@@ -114,10 +89,18 @@
       "aadhar": "121231231231",
       "username": "Jayanth_34",
       "password": "Jayanth@561"
+    },
+    {
+      "id": "3eaf",
+      "name": "dharmaalla",
+      "email": "minnu@gmail.com",
+      "mobile": "9999999999",
+      "aadhar": "111111111111",
+      "username": "rr",
+      "password": "minnu123@Z"
     }
   ],
   "accountRequests": [
-    {},
     {
       "id": "5301",
       "requestId": "1767755239602-1",

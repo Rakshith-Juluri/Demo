@@ -26,7 +26,7 @@ export default function Header({ userData }) {
         <div className="container px-4 d-flex justify-content-between align-items-center">
           
           {/* Brand - Left */}
-          <Link to="/home" className="navbar-brand d-flex align-items-center">
+          <Link to="/app/home" className="navbar-brand d-flex align-items-center">
             <div className="bg-primary rounded-3 d-flex align-items-center justify-content-center me-2 shadow-sm" style={{ width: "38px", height: "38px" }}>
               <i className="bi bi-bank2 text-white fs-5"></i>
             </div>
