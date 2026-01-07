@@ -26,7 +26,7 @@ export default function TransactionHistory({ transactions, onViewDetails }) {
         <div className="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-5 gap-3">
           <div>
             <h1 className="fw-black display-6 mb-0" style={{ color: theme.darkBlue, fontWeight: 900 }}>Transaction Ledger</h1>
-            <p className="text-secondary fw-medium">Monitor your money trail and download official statements.</p>
+            <p className="fs-5 text-secondary fw-medium">Monitor your money trail and download official statements.</p>
           </div>
           <button className="btn btn-primary rounded-pill px-4 py-3 fw-bold shadow-sm d-flex align-items-center justify-content-center" onClick={() => window.print()}>
             <i className="bi bi-download me-2"></i> Download Statement

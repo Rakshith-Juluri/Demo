@@ -12,12 +12,12 @@ const FundPage = ({ onSelfTransfer, onTransferToSomeone }) => {
 
   const handleSelfTransfer = () => {
     if (onSelfTransfer) return onSelfTransfer();
-    if (navigate) navigate('/funds/self-transfer');
+    if (navigate) navigate('/app/funds/self-transfer');
   };
 
   const handleTransferToSomeone = () => {
     if (onTransferToSomeone) return onTransferToSomeone();
-    if (navigate) navigate('/funds/transfer');
+    if (navigate) navigate('/app/funds/transfer');
   };
 
   return (
@@ -103,7 +103,7 @@ const FundPage = ({ onSelfTransfer, onTransferToSomeone }) => {
                 {/* ADD BENEFICIARY BUTTON */}
                 <button 
                   className="btn btn-outline-primary rounded-pill px-4 fw-bold"
-                  onClick={() => navigate('/funds/add-beneficiary')}
+                  onClick={() => navigate('/app/funds/add-beneficiary')}
                 >
                   <i className="bi bi-person-plus me-2"></i> Add New
                 </button>
@@ -111,7 +111,7 @@ const FundPage = ({ onSelfTransfer, onTransferToSomeone }) => {
                 {/* MANAGE BENEFICIARIES BUTTON */}
                 <button 
                   className="btn btn-dark rounded-pill px-4 fw-bold"
-                  onClick={() => navigate('/funds/manage-beneficiaries')}
+                  onClick={() => navigate('/app/funds/manage-beneficiaries')}
                 >
                   <i className="bi bi-person-lines-fill me-2"></i> Manage List
                 </button>

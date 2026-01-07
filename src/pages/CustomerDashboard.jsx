@@ -70,7 +70,7 @@ export default function CustomerDashboard() {
             <div className="card border-0 p-4 h-100 shadow-sm rounded-4 bg-white">
               <span className="text-muted small fw-bold mb-2 d-block">TOTAL AVAILABLE BALANCE</span>
               <h2 className="fw-black mb-4" style={{ color: theme.darkBlue }}>₹{userData?.balance?.toLocaleString() || "0"}</h2>
-              <Link to="/funds" className="btn btn-primary rounded-pill fw-bold py-2 w-100">Send Money</Link>
+              <Link to="/app/funds" className="btn btn-primary rounded-pill fw-bold py-2 w-100">Send Money</Link>
             </div>
           </div>
 
@@ -94,7 +94,7 @@ export default function CustomerDashboard() {
                 <div className="bg-success text-white px-2 py-1 rounded-pill" style={{fontSize: '10px', fontWeight: 'bold'}}>EXCELLENT</div>
               </div>
               <hr className="opacity-5" />
-              <Link to="/loans" className="text-decoration-none small fw-bold text-primary">apply for new loans →</Link>
+              <Link to="/app/loans" className="text-decoration-none small fw-bold text-primary">apply for new loans →</Link>
             </div>
           </div>
 

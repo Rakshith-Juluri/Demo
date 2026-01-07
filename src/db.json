@@ -23,8 +23,16 @@
           "status": "ACTIVE",
           "progress": 35,
           "history": [
-            { "date": "Dec 05", "amt": "38,500", "type": "Principal: ₹12,400 | Int: ₹26,100" },
-            { "date": "Nov 05", "amt": "38,500", "type": "Principal: ₹12,300 | Int: ₹26,200" }
+            {
+              "date": "Dec 05",
+              "amt": "38,500",
+              "type": "Principal: ₹12,400 | Int: ₹26,100"
+            },
+            {
+              "date": "Nov 05",
+              "amt": "38,500",
+              "type": "Principal: ₹12,300 | Int: ₹26,200"
+            }
           ]
         }
       ],
@@ -33,7 +41,10 @@
           "requestId": "1766294265338",
           "status": "approved",
           "accountType": "current",
-          "accountData": { "customerName": "Jayanth Kota", "panCard": "QWSED1234S" }
+          "accountData": {
+            "customerName": "Jayanth Kota",
+            "panCard": "QWSED1234S"
+          }
         }
       ]
     },
@@ -60,7 +71,11 @@
           "status": "ACTIVE",
           "progress": 62,
           "history": [
-            { "date": "Dec 12", "amt": "12,400", "type": "Principal: ₹8,100 | Int: ₹4,300" }
+            {
+              "date": "Dec 12",
+              "amt": "12,400",
+              "type": "Principal: ₹8,100 | Int: ₹4,300"
+            }
           ]
         }
       ],
@@ -90,6 +105,52 @@
           "accountType": "current"
         }
       ]
+    },
+    {
+      "id": "cfa4",
+      "name": "Jayanth kota",
+      "email": "Jayanth.Kota@cognizant.com",
+      "mobile": "2131212121",
+      "aadhar": "121231231231",
+      "username": "Jayanth_34",
+      "password": "Jayanth@561"
+    }
+  ],
+  "accountRequests": [
+    {},
+    {
+      "id": "5301",
+      "requestId": "1767755239602-1",
+      "userId": "89e1",
+      "customerName": "Jayanth Kota",
+      "fatherName": "Lokesh Kota",
+      "motherName": "Jotshna Kota",
+      "dob": "2026-01-06",
+      "gender": "",
+      "maritalStatus": "",
+      "occupation": "",
+      "annualIncome": "",
+      "accountype": "saving",
+      "nationality": "indian",
+      "panCard": "",
+      "adharCard": "",
+      "panCardFile": null,
+      "aadhaarCardFile": null,
+      "signatureFile": null,
+      "mobileNumber": "",
+      "otp": "",
+      "currentAddress": "",
+      "currentPincode": "",
+      "currentState": "",
+      "currentDistrict": "",
+      "currentLandmark": "",
+      "permanentAddress": "",
+      "permanentPincode": "",
+      "permanentState": "",
+      "permanentDistrict": "",
+      "permanentLandmark": "",
+      "status": "accepted",
+      "createdAt": "2026-01-07T03:07:19.602Z"
     }
   ],
   "accounts": [
@@ -150,26 +211,61 @@
     {
       "id": "SKY-40247",
       "timestamp": "2026-01-03T06:46:41.689Z",
-      "personalDetails": { "name": "Jayanth", "phone": "7013258867", "pan": "AWSED1234F", "employmentType": "salaried" },
-      "loanDetails": { "loanType": "personal", "income": "30000", "amount": "100000", "tenure": "24", "emi": "4684" },
+      "personalDetails": {
+        "name": "Jayanth",
+        "phone": "7013258867",
+        "pan": "AWSED1234F",
+        "employmentType": "salaried"
+      },
+      "loanDetails": {
+        "loanType": "personal",
+        "income": "30000",
+        "amount": "100000",
+        "tenure": "24",
+        "emi": "4684"
+      },
       "status": "PENDING APPROVAL"
     },
     {
       "id": "SKY-69110",
       "timestamp": "2026-01-05T04:42:25.164Z",
-      "personalDetails": { "name": "jayanth", "phone": "9876543210", "pan": "QASSS3345F", "employmentType": "business" },
-      "loanDetails": { "loanType": "home", "income": "26000", "amount": "1000000", "tenure": "359", "emi": "7694" },
+      "personalDetails": {
+        "name": "jayanth",
+        "phone": "9876543210",
+        "pan": "QASSS3345F",
+        "employmentType": "business"
+      },
+      "loanDetails": {
+        "loanType": "home",
+        "income": "26000",
+        "amount": "1000000",
+        "tenure": "359",
+        "emi": "7694"
+      },
       "status": "PENDING APPROVAL"
     }
   ],
   "admins": [
-    { "id": "1", "username": "admin12", "password": "admin123" }
+    {
+      "id": "1",
+      "username": "admin12",
+      "password": "admin123"
+    }
   ],
   "settings": {
     "limits": {
-      "NEFT": { "min": 1, "max": 200000 },
-      "RTGS": { "min": 200000, "max": 2000000 },
-      "IMPS": { "min": 1, "max": 200000 }
+      "NEFT": {
+        "min": 1,
+        "max": 200000
+      },
+      "RTGS": {
+        "min": 200000,
+        "max": 2000000
+      },
+      "IMPS": {
+        "min": 1,
+        "max": 200000
+      }
     },
     "fees": {
       "NEFT": "₹2.5–25",
