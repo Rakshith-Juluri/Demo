@@ -16,6 +16,8 @@ import LoanPage from './pages/Loan/Loan_page'
 import LoanApplication from './pages/Loan/LoanApplication'
 import AccountsPage from './pages/Accounts/Accounts_page'
 import SavingAccount from './pages/Accounts/SavingAccount'
+import CurrenrAccount from './pages/Accounts/CurrentAccount'
+
 
 function App() {
   return (
@@ -47,6 +49,7 @@ function App() {
           {/* Accounts */}
           <Route path="accounts" element={<AccountsPage />} />
           <Route path="accounts/savings-account" element={<SavingAccount />} />
+          <Route path="accounts/current-account" element={<CurrenrAccount />} />
 
           {/* Transactions */}
           <Route path="transactions" element={<TransactionsPage />} />

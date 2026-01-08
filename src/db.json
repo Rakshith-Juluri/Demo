@@ -117,41 +117,7 @@
     }
   ],
   "accountRequests": [
-    {},
-    {
-      "id": "5301",
-      "requestId": "1767755239602-1",
-      "userId": "89e1",
-      "customerName": "Jayanth Kota",
-      "fatherName": "Lokesh Kota",
-      "motherName": "Jotshna Kota",
-      "dob": "2026-01-06",
-      "gender": "",
-      "maritalStatus": "",
-      "occupation": "",
-      "annualIncome": "",
-      "accountype": "saving",
-      "nationality": "indian",
-      "panCard": "",
-      "adharCard": "",
-      "panCardFile": null,
-      "aadhaarCardFile": null,
-      "signatureFile": null,
-      "mobileNumber": "",
-      "otp": "",
-      "currentAddress": "",
-      "currentPincode": "",
-      "currentState": "",
-      "currentDistrict": "",
-      "currentLandmark": "",
-      "permanentAddress": "",
-      "permanentPincode": "",
-      "permanentState": "",
-      "permanentDistrict": "",
-      "permanentLandmark": "",
-      "status": "accepted",
-      "createdAt": "2026-01-07T03:07:19.602Z"
-    }
+   
   ],
   "accounts": [
     {

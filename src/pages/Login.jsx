@@ -166,7 +166,7 @@ function Login() {
                 style={{ height: '500px', background: 'transparent' }}
                 rendererSettings={{ preserveAspectRatio: 'xMidYMid meet' }}
               />
-              <h3 className="fw-black mt-4" style={{ color: theme.darkBlue, fontWeight: 900 }}>Sky Bank Digital Core</h3>
+              <h3 className="fw-black mt-4" style={{ color: theme.darkBlue, fontWeight: 900 }}>Digi Bank</h3>
               <p className="text-secondary opacity-75">Multi-factor encrypted authentication for your safety.</p>
             </div>
           </div>

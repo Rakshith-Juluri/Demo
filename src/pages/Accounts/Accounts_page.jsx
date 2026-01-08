@@ -66,7 +66,7 @@ const AccountsPage = () => {
   const handleCreateAccount = (type) => {
     setIsModalOpen(false);
     if (type === 'savings') navigate('/app/accounts/savings-account');
-    else if (type === 'current') navigate('/open-current-account');
+    else if (type === 'current') navigate('/app/accounts/current-account');
   };
 
   const toggleAccountStatus = (id) => {
