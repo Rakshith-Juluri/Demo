@@ -35,17 +35,6 @@
             }
           ]
         }
-      ],
-      "accountRequests": [
-        {
-          "requestId": "1766294265338",
-          "status": "approved",
-          "accountType": "current",
-          "accountData": {
-            "customerName": "Jayanth Kota",
-            "panCard": "QWSED1234S"
-          }
-        }
       ]
     },
     {
@@ -78,13 +67,6 @@
             }
           ]
         }
-      ],
-      "accountRequests": [
-        {
-          "requestId": "1766294265340",
-          "status": "approved",
-          "accountType": "savings"
-        }
       ]
     },
     {
@@ -97,14 +79,7 @@
       "cibilScore": 650,
       "healthStatus": "Average",
       "balance": 0,
-      "loans": [],
-      "accountRequests": [
-        {
-          "requestId": "1766294265341",
-          "status": "approved",
-          "accountType": "current"
-        }
-      ]
+      "loans": []
     },
     {
       "id": "cfa4",
@@ -113,11 +88,28 @@
       "mobile": "2131212121",
       "aadhar": "121231231231",
       "username": "Jayanth_34",
-      "password": "Jayanth@561"
+      "password": "Jayanth@561",
+      "cibilScore": 0,
+      "healthStatus": "Not Available",
+      "balance": 0,
+      "loans": []
+    },
+    {
+      "id": "3eaf",
+      "name": "dharmaalla",
+      "email": "minnu@gmail.com",
+      "mobile": "9999999999",
+      "aadhar": "111111111111",
+      "username": "rr",
+      "password": "minnu123@Z",
+      "cibilScore": 0,
+      "healthStatus": "Not Available",
+      "balance": 0,
+      "loans": []
     }
   ],
   "accountRequests": [
-   
+
   ],
   "accounts": [
     {
@@ -130,7 +122,7 @@
     },
     {
       "id": "ACC002",
-      "displayName": "Salary ****9876",
+      "displayName": "current ****9876",
       "balance": 19968,
       "currency": "₹",
       "customerId": "89e1",
@@ -154,23 +146,50 @@
       "id": "1",
       "accountId": "ACC001",
       "beneficiaryId": "BEN001",
+      "beneficiaryName": "Rahul Sharma",
       "amount": 1212,
       "transferType": "IMPS",
       "status": "SUCCESS",
       "timestamp": "2025-12-28T16:18:01.956Z",
       "charges": "₹5.00",
-      "utr": "UTR889690319465"
+      "utr": "UTR889690319465",
+      "remarks": "Payment for services",
+      "type": "DEBIT"
     },
     {
       "id": "173c",
       "accountId": "ACC001",
       "beneficiaryId": "BEN001",
+      "beneficiaryName": "Rahul Sharma",
       "amount": 200000,
       "transferType": "RTGS",
       "status": "SCHEDULED",
       "timestamp": "2025-12-30T12:47:59.191Z",
       "charges": "₹45.00",
-      "scheduledFor": "2025-12-30T18:19:00.000Z"
+      "scheduledFor": "2025-12-30T18:19:00.000Z",
+      "remarks": "Property payment",
+      "type": "DEBIT"
+    },
+    {
+      "id": "2",
+      "accountId": "ACC002",
+      "amount": 50000,
+      "transferType": "CREDIT",
+      "status": "SUCCESS",
+      "timestamp": "2025-12-25T10:30:00.000Z",
+      "remarks": "Salary credit",
+      "type": "CREDIT"
+    },
+    {
+      "id": "3",
+      "accountId": "ACC001",
+      "amount": 5000,
+      "transferType": "ATM",
+      "status": "SUCCESS",
+      "timestamp": "2025-12-24T14:20:00.000Z",
+      "charges": "₹0.00",
+      "remarks": "ATM withdrawal",
+      "type": "DEBIT"
     }
   ],
   "applications": [

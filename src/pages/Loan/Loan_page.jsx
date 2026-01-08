@@ -2,7 +2,6 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import "bootstrap/dist/css/bootstrap.min.css";
 
-
 export default function Loan() {
   const [expandedLoan, setExpandedLoan] = useState(null);
   const [userData, setUserData] = useState(null);
@@ -86,11 +85,6 @@ export default function Loan() {
     navigate('/app/loans/apply');
   };
 
-  const handlePayNow = (loanId, amount) => {
-    // FUNCTIONALITY PLACEHOLDER: Integrate your payment gateway here
-    alert(`Redirecting to payment for Loan ${loanId}. Amount: ₹${amount.toLocaleString()}`);
-  };
-
   if (loading) {
     return (
       <div className="d-flex justify-content-center align-items-center" style={{height: "100vh"}}>
@@ -108,7 +102,6 @@ export default function Loan() {
 
   return (
     <>
-    
       <div style={{
         background: "linear-gradient(180deg, #E0F2FE 0%, #F8FAFC 600px)",
         minHeight: "100vh",
@@ -219,7 +212,7 @@ export default function Loan() {
                         <div className="col-6 col-md-2 text-center">
                           <div className="d-flex justify-content-between align-items-end mb-1">
                              <small className="text-muted fw-bold" style={{ fontSize: '10px' }}>PROGRESS</small>
-                             <small className="fw-bold text-primary" style={{ fontSize: '10px' }}>{loan.tenureRemaining} DUE</small>
+                             <small className="fw-bold text-primary" style={{ fontSize: '10px' }}>{loan.tenureRemaining} MO DUE</small>
                           </div>
                           <div className="progress mb-2" style={{ height: "10px", borderRadius: "20px", background: "#f1f5f9" }}>
                             <div className="progress-bar bg-info shadow-sm" style={{ width: `${loan.progress}%`, borderRadius: "20px" }}></div>
@@ -229,12 +222,12 @@ export default function Loan() {
                         <div className="col-6 col-md-2 text-end">
                            <button 
                              onClick={(e) => {
-                               e.stopPropagation(); // Prevents card expansion when clicking the button
-                               handlePayNow(loan.id, loan.monthlyEmi);
+                               e.stopPropagation(); 
+                               setExpandedLoan(expandedLoan === loan.id ? null : loan.id);
                              }}
-                             className="btn btn-primary btn-sm rounded-pill px-3 fw-bold shadow-sm"
+                             className="btn btn-outline-primary btn-sm rounded-pill px-3 fw-bold shadow-sm"
                            >
-                             Pay Now
+                             View Details
                            </button>
                            <i 
                              onClick={() => setExpandedLoan(expandedLoan === loan.id ? null : loan.id)}
@@ -265,12 +258,19 @@ export default function Loan() {
                           </div>
                           <div className="col-lg-8">
                              <h6 className="fw-black text-muted mb-4 small">PAYMENT HISTORY</h6>
-                             {loan.history?.map((entry, idx) => (
-                               <div key={idx} className="d-flex justify-content-between py-2 border-bottom">
-                                  <span className="text-secondary">{entry.date} - {entry.type}</span>
-                                  <span className="fw-bold">₹{entry.amt?.toLocaleString()}</span>
-                               </div>
-                             ))}
+                             {loan.history?.length > 0 ? (
+                               loan.history.map((entry, idx) => (
+                                 <div key={idx} className="d-flex justify-content-between py-2 border-bottom">
+                                    <div className="d-flex flex-column">
+                                      <span className="fw-bold text-dark">{entry.date}</span>
+                                      <small className="text-muted" style={{fontSize: '11px'}}>{entry.type}</small>
+                                    </div>
+                                    <span className="fw-bold text-success">₹{entry.amt}</span>
+                                 </div>
+                               ))
+                             ) : (
+                               <p className="text-muted small">No payment history available yet.</p>
+                             )}
                           </div>
                         </div>
                       </div>

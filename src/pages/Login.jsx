@@ -20,57 +20,51 @@ function Login() {
   };
 
   const Buttontag = async () => {
-  // 1. Validation Logic
-  if (isLogin) {
-    if (!username.trim()) { setError("Username is required"); return; }
-    if (!password.trim()) { setError("Password is required"); return; }
-    if (password.length < 8) { setError("Password must be at least 8 characters"); return; }
-  } else {
-    if (!adminUsername.trim()) { setError("Username is required"); return; }
-    if (!adminPassword.trim()) { setError("Password is required"); return; }
-    if (adminPassword.length < 6) { setError("Password must be at least 6 characters"); return; }
-  }
-
-  try {
-    const endpoint = isLogin ? "http://localhost:4001/users" : "http://localhost:4001/admins";
-    const res = await fetch(endpoint);
-    if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
-    const data = await res.json();
-
-    // 2. Finding the User/Admin
-    const found = isLogin
-      ? data.find((u) => u.username === username && u.password === password)
-      : data.find((a) => a.username === adminUsername && a.password === adminPassword);
-
-    if (found) {
-      setError("");
-      
-      if (isLogin) {
-        // User Login Success
-        localStorage.setItem('loggedInUser', JSON.stringify({
-          id: found.id,
-          name: found.name,
-          username: found.username,
-          role: 'user' // Added role for better route guarding later
-        }));
-        navigate('/app'); 
-      } else {
-        // Admin Login Success
-        localStorage.setItem('adminSession', JSON.stringify({
-          id: found.id,
-          username: found.username,
-          role: 'admin'
-        }));
-        navigate('/admin-dashboard'); // Redirect to admin-specific path
-      }
+    if (isLogin) {
+      if (!username.trim()) { setError("Username is required"); return; }
+      if (!password.trim()) { setError("Password is required"); return; }
+      if (password.length < 8) { setError("Password must be at least 8 characters"); return; }
     } else {
-      setError("The Username or password you entered is wrong. Try again");
+      if (!adminUsername.trim()) { setError("Username is required"); return; }
+      if (!adminPassword.trim()) { setError("Password is required"); return; }
+      if (adminPassword.length < 6) { setError("Password must be at least 6 characters"); return; }
     }
-  } catch (err) {
-    console.error(err);
-    setError("Server error");
-  }
-};
+
+    try {
+      const endpoint = isLogin ? "http://localhost:4001/users" : "http://localhost:4001/admins";
+      const res = await fetch(endpoint);
+      const data = await res.json();
+
+      const found = isLogin
+        ? data.find((u) => u.username === username && u.password === password)
+        : data.find((a) => a.username === adminUsername && a.password === adminPassword);
+
+      if (found) {
+        setError("");
+        if (isLogin) {
+          localStorage.setItem('loggedInUser', JSON.stringify({
+            id: found.id,
+            name: found.name,
+            username: found.username,
+            role: 'user'
+          }));
+          navigate('/app'); 
+        } else {
+          localStorage.setItem('adminSession', JSON.stringify({
+            id: found.id,
+            username: found.username,
+            role: 'admin'
+          }));
+          navigate('/admindashboard');
+        }
+      } else {
+        setError("The Username or password you entered is wrong. Try again");
+      }
+    } catch (err) {
+      console.error(err);
+      setError("Server error");
+    }
+  };
 
   return (
     <div style={{ background: theme.bgGradient, minHeight: "100vh", fontFamily: "'Inter', sans-serif" }} className="d-flex align-items-center">
@@ -81,7 +75,6 @@ function Login() {
           <div className="col-lg-5">
             <div className="card border-0 shadow-lg rounded-5 p-4 p-md-5 bg-white">
               
-              {/* Toggle Buttons */}
               <div className="d-flex bg-light rounded-pill p-1 mb-4">
                 <button
                   className={`btn w-50 rounded-pill fw-bold py-2 transition-all ${isLogin ? 'btn-primary shadow' : 'btn-light text-secondary'}`}
@@ -106,7 +99,6 @@ function Login() {
                 <p className="text-secondary small">Please enter your credentials to continue</p>
               </div>
 
-              {/* Form Fields */}
               <div className="mb-3">
                 <div className="input-group bg-light rounded-pill px-3 py-1 border-0">
                   <span className="input-group-text bg-transparent border-0 text-muted"><i className="bi bi-person-fill"></i></span>
@@ -156,18 +148,23 @@ function Login() {
             </div>
           </div>
 
-          {/* Right Side: Lottie Animation */}
+          {/* Right Side: Fully Transparent Animation */}
           <div className="col-lg-7 d-none d-lg-block">
-            <div className="text-center">
+            <div className="d-flex justify-content-center align-items-center bg-transparent">
               <Lottie
                 animationData={SecureLoginAnimation}
                 loop
                 autoplay
-                style={{ height: '500px', background: 'transparent' }}
-                rendererSettings={{ preserveAspectRatio: 'xMidYMid meet' }}
+                style={{ 
+                  width: '90%', 
+                  maxWidth: '600px', 
+                  background: 'transparent' // Force transparency
+                }} 
               />
+
               <h3 className="fw-black mt-4" style={{ color: theme.darkBlue, fontWeight: 900 }}>Digi Bank</h3>
               <p className="text-secondary opacity-75">Multi-factor encrypted authentication for your safety.</p>
+
             </div>
           </div>
 
