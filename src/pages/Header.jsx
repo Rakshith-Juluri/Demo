@@ -80,7 +80,7 @@ export default function Header({ userData }) {
             </div>
 
             {/* Profile Icon */}
-            <Link to="/personal-info" className="text-decoration-none">
+            <Link to="/app/profile" className="text-decoration-none">
               <div className="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center fw-bold shadow-sm" style={{ width: "45px", height: "45px", fontSize: "15px", border: "2px solid #E0F2FE" }}>
                 {userData?.name ? userData.name.split(" ").map((n) => n[0]).join("") : "NA"}
               </div>

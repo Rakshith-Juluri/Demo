@@ -51,6 +51,26 @@ function SavingAccount() {
     border: "#E2E8F0"
   };
 
+  // Sync key contact/address fields to Profile after a successful submission
+  const updateProfileLocalStorage = () => {
+    try {
+      const [fn, ...lnRest] = String(formData.customerName || '').trim().split(/\s+/);
+      const patch = {
+        firstName: fn || undefined,
+        lastName: lnRest.join(' ') || undefined,
+        phone: formData.mobileNumber || undefined,
+        address: formData.currentAddress || undefined,
+        landmark: formData.currentLandmark || undefined,
+        district: formData.currentDistrict || undefined,
+        state: formData.currentState || undefined,
+        zip: formData.currentPincode || undefined,
+      };
+      const existing = JSON.parse(localStorage.getItem('userProfileData') || '{}');
+      const merged = { ...existing, ...Object.fromEntries(Object.entries(patch).filter(([, v]) => v)) };
+      localStorage.setItem('userProfileData', JSON.stringify(merged));
+    } catch {}
+  };
+
   // --- ADDED DUMMY OTP LOGIC ---
   const handleGenerateOTP = () => {
     // Validate mobile number format first
@@ -274,6 +294,8 @@ function SavingAccount() {
       });
 
       if (!res.ok) throw new Error(`Server responded ${res.status}`);
+      // Write address/phone back to profile cache so Profile auto-updates
+      updateProfileLocalStorage();
       navigate('/app/accounts');
     } catch (err) {
       setSubmitError(err.message || 'Submission failed');

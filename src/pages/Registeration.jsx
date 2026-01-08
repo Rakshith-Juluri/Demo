@@ -67,6 +67,31 @@ function Register() {
     setErrors(newErrors);
     if (Object.keys(newErrors).length > 0) return;
 
+    // Persist to localStorage so Profile auto-fills even if API is offline
+    try {
+      const [firstName, ...lastNameParts] = String(name).trim().split(/\s+/);
+      const profilePatch = {
+        firstName: firstName || 'John',
+        lastName: lastNameParts.join(' ') || 'Doe',
+        email,
+        phone: mobile,
+        aadhar,
+        pancard: '',
+        address: '',
+        landmark: '',
+        district: '',
+        state: '',
+        zip: ''
+      };
+      const existing = JSON.parse(localStorage.getItem('userProfileData') || '{}');
+      const merged = { ...existing, ...profilePatch };
+      localStorage.setItem('userProfileData', JSON.stringify(merged));
+
+      // Seed a lightweight loggedInUser for later hydration
+      const tempUser = { id: String(Date.now()), name, email, mobile };
+      localStorage.setItem('loggedInUser', JSON.stringify(tempUser));
+    } catch {}
+
     try {
       const response = await fetch('http://localhost:4001/users', {
         method: 'POST',
@@ -75,12 +100,22 @@ function Register() {
       });
 
       if (response.ok) {
+        // Update loggedInUser with server-assigned id if available
+        try {
+          const created = await response.json();
+          if (created && created.id) {
+            const updated = { id: String(created.id), name, email, mobile };
+            localStorage.setItem('loggedInUser', JSON.stringify(updated));
+          }
+        } catch {}
         setSubmitted(true);
       } else {
         setErrors({ form: "Registration failed. Try again." });
       }
     } catch (error) {
-      setErrors({ form: "Server connection error." });
+      // Still allow proceeding with locally cached data
+      setErrors({ form: "Server connection error. Using local data only." });
+      setSubmitted(true);
     }
   };
 

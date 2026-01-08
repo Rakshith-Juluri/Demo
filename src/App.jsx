@@ -23,8 +23,7 @@ import CurrenrAccount from './pages/Accounts/CurrentAccount'
 import AdminDashboard from './pages/Admin/AdminDashboard'
 import ProtectedAdminRoute from './pages/Admin/ProtectedAdminRoute'
 import AccountControl from './pages/Accounts/AccountControl'
-
-
+import Profile from './pages/Profile'
 function App() {
   return (
     <BrowserRouter>
@@ -70,6 +69,7 @@ function App() {
           {/* Loans */}
           <Route path="loans" element={<LoanPage />} />
           <Route path="loans/apply" element={<LoanApplication />} />
+          <Route path="profile" element={<Profile />} />
 
           {/* future routes like /accounts, /loans can be added here */}
         </Route>
