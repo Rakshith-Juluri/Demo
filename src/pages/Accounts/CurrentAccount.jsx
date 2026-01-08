@@ -3,10 +3,11 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import { Container, Card, Form, Row, Col, Button, InputGroup, Alert, Spinner } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 
-function SavingAccount() {
+function CurrentAccount() {
   const navigate = useNavigate();
   const [step, setStep] = useState(1);
   const [isSameAddress, setIsSameAddress] = useState(false);
+  const [saveSuccess, setSaveSuccess] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState(null);
   const [errors, setErrors] = useState({});
@@ -24,12 +25,12 @@ function SavingAccount() {
     maritalStatus: "",
     occupation: "",
     annualIncome: "",
-    accountype: "saving",
+    accountype: "current",
     nationality: "",
     panCard: "",
     adharCard: "",
     panCardFile: null,
-    aadhaarCardFile: null,
+    BussinessRegForm: null,
     signatureFile: null,
     mobileNumber: "",
     otp: "",
@@ -51,25 +52,21 @@ function SavingAccount() {
     border: "#E2E8F0"
   };
 
-  // --- ADDED DUMMY OTP LOGIC ---
+  // DUMMY OTP GENERATOR LOGIC
   const handleGenerateOTP = () => {
-    // Validate mobile number format first
     if (!/^\d{10}$/.test(formData.mobileNumber)) {
         setErrors(prev => ({ ...prev, mobileNumber: "Enter a valid 10-digit number first" }));
         return;
     }
     
-    // Generate a random 6-digit number
+    // Clear error once valid number is provided
+    setErrors(prev => ({ ...prev, mobileNumber: null }));
+
     const dummyOtp = Math.floor(100000 + Math.random() * 900000).toString();
-    
-    // Alert the user (Simulation)
     alert(`[SIMULATION] Verification code sent to ${formData.mobileNumber}: ${dummyOtp}`);
     
-    // Auto-fill the field for convenience or leave it for user to type
     setFormData(prev => ({ ...prev, otp: dummyOtp }));
-    
-    // Clear any existing errors for these fields
-    setErrors(prev => ({ ...prev, mobileNumber: null, otp: null }));
+    setErrors(prev => ({ ...prev, otp: null }));
   };
 
   useEffect(() => {
@@ -89,7 +86,7 @@ function SavingAccount() {
       }
 
       try {
-        const res = await fetch(`http://localhost:4001/accountRequests?userId=${loggedUserId}&accountype=saving`);
+        const res = await fetch(`http://localhost:4001/accountRequests?userId=${loggedUserId}&accountype=current`);
         const data = await res.json();
         const existing = data.find(req => req.status === 'pending' || req.status === 'accepted');
         
@@ -108,35 +105,26 @@ function SavingAccount() {
 
   const validateStep = () => {
     let newErrors = {};
-    
+
     const getAge = (birthDate) => {
-      const today = new Date();
-      const birth = new Date(birthDate);
-      let age = today.getFullYear() - birth.getFullYear();
-      const m = today.getMonth() - birth.getMonth();
-      if (m < 0 || (m === 0 && today.getDate() < birth.getDate())) age--;
-      return age;
+        const today = new Date();
+        const birth = new Date(birthDate);
+        let age = today.getFullYear() - birth.getFullYear();
+        const m = today.getMonth() - birth.getMonth();
+        if (m < 0 || (m === 0 && today.getDate() < birth.getDate())) age--;
+        return age;
     };
 
     if (step === 1) {
-      if (!formData.customerName || formData.customerName.length <= 5) 
-        newErrors.customerName = "Name must be greater than 5 characters";
-      
+      if (!formData.customerName || formData.customerName.length <= 5) newErrors.customerName = "Full Name must be greater than 5 characters";
       if (!formData.dob) {
-        newErrors.dob = "Date of birth is required";
+          newErrors.dob = "Date of birth is required";
       } else if (getAge(formData.dob) < 18) {
-        newErrors.dob = "Age must be greater than 18 years";
+          newErrors.dob = "Age must be greater than 18 years";
       }
-
-      if (!formData.fatherName || formData.fatherName.length <= 5) 
-        newErrors.fatherName = "Father's name must be greater than 5 characters";
-      
-      if (!formData.motherName || formData.motherName.length <= 5) 
-        newErrors.motherName = "Mother's name must be greater than 5 characters";
-      
-      if (!formData.nationality || formData.nationality.length <= 5) 
-        newErrors.nationality = "Nationality must be greater than 5 characters";
-
+      if (!formData.fatherName || formData.fatherName.length <= 5) newErrors.fatherName = "Father's name must be greater than 5 characters";
+      if (!formData.motherName || formData.motherName.length <= 5) newErrors.motherName = "Mother's name must be greater than 5 characters";
+      if (!formData.nationality || formData.nationality.length <= 5) newErrors.nationality = "Nationality must be greater than 5 characters";
       if (!formData.gender) newErrors.gender = "Gender is required";
       if (!formData.maritalStatus) newErrors.maritalStatus = "Marital status is required";
       if (!formData.occupation) newErrors.occupation = "Occupation is required";
@@ -145,52 +133,44 @@ function SavingAccount() {
     } else if (step === 2) {
       const panRegex = /^[A-Z]{5}[0-9]{4}[A-Z]{1}$/;
       if (!formData.panCard) {
-        newErrors.panCard = "PAN number is required";
+          newErrors.panCard = "PAN number is required";
       } else if (!panRegex.test(formData.panCard.toUpperCase())) {
-        newErrors.panCard = "Invalid PAN format (e.g., ABCDE1234F)";
+          newErrors.panCard = "Invalid PAN format (e.g., ABCDE1234F)";
       }
-
+      
       if (!formData.adharCard) {
-        newErrors.adharCard = "Aadhaar number is required";
-      } else if (!/^\d{12}$/.test(formData.adharCard.replace(/\s/g, ""))) {
-        newErrors.adharCard = "Aadhaar must be exactly 12 numbers";
+          newErrors.adharCard = "Aadhaar number is required";
+      } else if (!/^\d{12}$/.test(formData.adharCard)) {
+          newErrors.adharCard = "Aadhaar must be exactly 12 numbers";
       }
 
       if (!formData.panCardFile) newErrors.panCardFile = "PAN file is required";
-      if (!formData.aadhaarCardFile) newErrors.aadhaarCardFile = "Aadhaar file is required";
+      if (!formData.BussinessRegForm) newErrors.BussinessRegForm = "Business reg form file is required";
       if (!formData.signatureFile) newErrors.signatureFile = "Signature file is required";
 
     } else if (step === 3) {
-      if (!formData.currentAddress || formData.currentAddress.length <= 10) 
-        newErrors.currentAddress = "Address must be more than 10 characters";
-      if (!formData.currentDistrict || formData.currentDistrict.length <= 5) 
-        newErrors.currentDistrict = "District must be greater than 5 characters";
-      if (!formData.currentPincode || formData.currentPincode.length < 6) 
-        newErrors.currentPincode = "Pincode must be greater than 6 numbers";
-      if (!formData.currentState || formData.currentState.length <= 6) 
-        newErrors.currentState = "State must be greater than 6 characters";
-
-      if (!isSameAddress) {
-        if (!formData.permanentAddress || formData.permanentAddress.length <= 10) 
-          newErrors.permanentAddress = "Permanent address more than 10 characters";
-        if (!formData.permanentDistrict || formData.permanentDistrict.length <= 5) 
-          newErrors.permanentDistrict = "District greater than 5 characters";
-        if (!formData.permanentPincode || formData.permanentPincode.length < 6) 
-          newErrors.permanentPincode = "Pincode greater than 6 numbers";
-        if (!formData.permanentState || formData.permanentState.length <= 6) 
-          newErrors.permanentState = "State greater than 6 characters";
-      }
+      if (!formData.currentAddress || formData.currentAddress.length <= 10) newErrors.currentAddress = "Address must be more than 10 characters";
+      if (!formData.currentDistrict || formData.currentDistrict.length <= 5) newErrors.currentDistrict = "District must be greater than 5 characters";
+      if (!formData.currentPincode || formData.currentPincode.length < 6) newErrors.currentPincode = "Pincode must be 6 or more numbers";
+      if (!formData.currentState || formData.currentState.length <= 6) newErrors.currentState = "State must be greater than 6 characters";
 
       if (!formData.mobileNumber) {
-        newErrors.mobileNumber = "Mobile number is required";
+          newErrors.mobileNumber = "Mobile number is required";
       } else if (!/^\d{10}$/.test(formData.mobileNumber)) {
-        newErrors.mobileNumber = "Mobile number must be 10 numbers";
+          newErrors.mobileNumber = "Mobile number must be exactly 10 numbers";
       }
 
       if (!formData.otp) {
-        newErrors.otp = "OTP is required";
+          newErrors.otp = "OTP is required";
       } else if (!/^\d{6}$/.test(formData.otp)) {
-        newErrors.otp = "OTP must be 6 numbers";
+          newErrors.otp = "OTP must be exactly 6 numbers";
+      }
+
+      if (!isSameAddress) {
+        if (!formData.permanentAddress || formData.permanentAddress.length <= 10) newErrors.permanentAddress = "Permanent Address must be more than 10 characters";
+        if (!formData.permanentDistrict || formData.permanentDistrict.length <= 5) newErrors.permanentDistrict = "District must be greater than 5 characters";
+        if (!formData.permanentPincode || formData.permanentPincode.length < 6) newErrors.permanentPincode = "Pincode must be 6 or more numbers";
+        if (!formData.permanentState || formData.permanentState.length <= 6) newErrors.permanentState = "State must be greater than 6 characters";
       }
     }
 
@@ -201,17 +181,30 @@ function SavingAccount() {
   const handleChange = (e) => {
     const { name, value, files, type } = e.target;
     
-    // Numeric masking for mobile and otp
-    if (name === "mobileNumber" || name === "otp") {
+    if (name === "mobileNumber") {
         const val = value.replace(/\D/g, "");
-        setFormData(prev => ({ ...prev, [name]: val }));
-    } else {
-        setFormData((prev) => ({
-          ...prev,
-          [name]: type === "file" ? files[0] : value
-        }));
+        if (val.length <= 10) {
+            setFormData(prev => ({ ...prev, [name]: val }));
+            // Specific fix: clear mobile error when typing
+            if (errors.mobileNumber) setErrors(prev => ({ ...prev, mobileNumber: null }));
+        }
+        return;
     }
-    
+
+    if (name === "otp") {
+        const val = value.replace(/\D/g, "");
+        if (val.length <= 6) {
+            setFormData(prev => ({ ...prev, [name]: val }));
+            // Specific fix: clear otp error when typing
+            if (errors.otp) setErrors(prev => ({ ...prev, otp: null }));
+        }
+        return;
+    }
+
+    setFormData((prev) => ({
+      ...prev,
+      [name]: type === "file" ? files[0] : value
+    }));
     if (errors[name]) setErrors(prev => ({ ...prev, [name]: null }));
   };
 
@@ -302,23 +295,23 @@ function SavingAccount() {
       <Card className="mx-auto border-0 shadow-lg overflow-hidden" style={{ maxWidth: "1000px", borderRadius: "30px" }}>
         <div className="bg-white p-4 border-bottom d-flex justify-content-between align-items-center">
           <div>
-            <h4 className="fw-black mb-1" style={{ color: theme.darkBlue }}>Open Savings Account</h4>
+            <h4 className="fw-black mb-1" style={{ color: theme.darkBlue }}>Open Current Account</h4>
             {!hasExistingAccount && (
                 <p className="text-secondary small mb-0">Step {step}: {step === 1 ? "Personal Details" : step === 2 ? "KYC & Uploads" : "Contact & Address"}</p>
             )}
           </div>
           <div className="d-flex align-items-center gap-3">
-               {!hasExistingAccount && (
+              {!hasExistingAccount && (
                 <div className="text-end d-none d-md-block">
                     <div className="small fw-bold text-muted">Progress: {Math.round((step/3)*100)}%</div>
                     <div className="progress mt-1" style={{ height: '6px', width: '100px' }}>
                         <div className="progress-bar" style={{ width: `${(step/3)*100}%`, backgroundColor: theme.primary }}></div>
                     </div>
                 </div>
-               )}
-               <Button variant="light" onClick={() => navigate(-1)} className="rounded-circle shadow-sm border">
-                 <i className="bi bi-x-lg"></i>
-               </Button>
+              )}
+              <Button variant="light" onClick={() => navigate(-1)} className="rounded-circle shadow-sm border">
+                <i className="bi bi-x-lg"></i>
+              </Button>
           </div>
         </div>
 
@@ -332,7 +325,7 @@ function SavingAccount() {
                 </div>
                 <h3 className="fw-bold">Application Under Review</h3>
                 <p className="text-muted mx-auto" style={{ maxWidth: '500px' }}>
-                  Your request for a Savings Account is currently <strong>pending</strong>. 
+                  Your request for a Current Account is currently <strong>pending</strong>. 
                   Please wait for our team to verify your documents before submitting a new request.
                 </p>
               </>
@@ -343,8 +336,8 @@ function SavingAccount() {
                 </div>
                 <h3 className="fw-bold">Account Already Exists</h3>
                 <p className="text-muted mx-auto" style={{ maxWidth: '500px' }}>
-                  Our records show that you <strong>already have an active Savings Account</strong> with us. 
-                  Per bank policy, customers are limited to one savings account.
+                  Our records show that you <strong>already have an active Current Account</strong> with us. 
+                  Per bank policy, customers are limited to one Current account.
                 </p>
               </>
             )}
@@ -406,7 +399,7 @@ function SavingAccount() {
                       <Form.Label className="small fw-bold">Occupation</Form.Label>
                       <Form.Select isInvalid={!!errors.occupation} name="occupation" value={formData.occupation} onChange={handleChange}>
                         <option value="">Select</option>
-                        <option>Salaried</option><option>Self-Employed</option><option>Student</option><option>Business</option>
+                        <option>Salaried</option><option>Self-Employed</option><option>Business</option>
                       </Form.Select>
                       <Form.Control.Feedback type="invalid">{errors.occupation}</Form.Control.Feedback>
                     </Col>
@@ -431,7 +424,7 @@ function SavingAccount() {
                   <Row className="g-4">
                     <Col md={6}>
                       <div className="p-4 border rounded-4 bg-light bg-opacity-50 h-100">
-                        <Form.Label className="fw-bold small">Pan Card Number</Form.Label>
+                        <Form.Label className="fw-bold small">PAN CARD NUMBER</Form.Label>
                         <Form.Control isInvalid={!!errors.panCard} className="mb-3" name="panCard" placeholder="ABCDE1234F" onChange={handleChange} />
                         <Form.Control.Feedback type="invalid">{errors.panCard}</Form.Control.Feedback>
                         <Form.Label className="very-small text-muted">Upload PAN Card Copy</Form.Label>
@@ -441,12 +434,12 @@ function SavingAccount() {
                     </Col>
                     <Col md={6}>
                       <div className="p-4 border rounded-4 bg-light bg-opacity-50 h-100">
-                        <Form.Label className="fw-bold small"> Aadhaar Card Number</Form.Label>
-                        <Form.Control isInvalid={!!errors.adharCard} className="mb-3" name="adharCard" value={formData.adharCard} placeholder="1234 5678 9012" onChange={handleChange} />
+                        <Form.Label className="fw-bold small">Aadhaar CARD NUMBER</Form.Label>
+                        <Form.Control isInvalid={!!errors.adharCard} className="mb-3" name="adharCard" placeholder="1234 5678 9012" onChange={handleChange} />
                         <Form.Control.Feedback type="invalid">{errors.adharCard}</Form.Control.Feedback>
-                        <Form.Label className="very-small text-muted">Upload Aadhaar Copy</Form.Label>
-                        <Form.Control isInvalid={!!errors.aadhaarCardFile} type="file" name="aadhaarCardFile" onChange={handleChange} size="sm" />
-                        {errors.aadhaarCardFile && <div className="text-danger small mt-1">{errors.aadhaarCardFile}</div>}
+                        <Form.Label className="very-small text-muted">Upload Business reg form</Form.Label>
+                        <Form.Control isInvalid={!!errors.BussinessRegForm} type="file" name="BussinessRegForm" onChange={handleChange} size="sm" />
+                        {errors.BussinessRegForm && <div className="text-danger small mt-1">{errors.BussinessRegForm}</div>}
                       </div>
                     </Col>
                     <Col md={12}>
@@ -485,7 +478,7 @@ function SavingAccount() {
                                 <Form.Control isInvalid={!!errors.currentState} name="currentState" placeholder="State" value={formData.currentState} onChange={handleChange} />
                                 <Form.Control.Feedback type="invalid">{errors.currentState}</Form.Control.Feedback>
                               </Col>
-                              <Col md={6}><Form.Control name="currentLandmark" placeholder="Landmark" value={formData.currentLandmark} onChange={handleChange} /></Col>
+                              <Col md={6}><Form.Control name="currentLandmark" placeholder="Landmark optional" value={formData.currentLandmark} onChange={handleChange} /></Col>
                           </Row>
                       </div>
                       <Form.Check type="checkbox" label="Permanent address same as current" className="mb-3 small fw-bold" checked={isSameAddress} onChange={handleSameAddress} />
@@ -507,23 +500,26 @@ function SavingAccount() {
                                     <Form.Control isInvalid={!!errors.permanentState} name="permanentState" placeholder="State" value={formData.permanentState} onChange={handleChange} />
                                     <Form.Control.Feedback type="invalid">{errors.permanentState}</Form.Control.Feedback>
                                   </Col>
-                                  <Col md={6}><Form.Control name="permanentLandmark" placeholder="Landmark" value={formData.permanentLandmark} onChange={handleChange} /></Col>
+                                  <Col md={6}><Form.Control name="permanentLandmark" placeholder="Landmark Optional" value={formData.permanentLandmark} onChange={handleChange} /></Col>
                               </Row>
                           </div>
                       )}
                     </Col>
+                    
                     <Col md={5}>
-                      <div className="card border p-4 rounded-4 h-100 shadow-sm d-flex flex-column justify-content-center" style={{ backgroundColor: "#F8FAFC", border: "1.5px solid #E2E8F0" }}>
+                      <div className="p-4 border rounded-4 bg-white shadow-sm h-100 border-primary border-opacity-25 d-flex flex-column justify-content-center">
                           <h6 className="fw-bold mb-4 text-primary text-center">Contact Verification</h6>
-                          <Form.Label className="very-small fw-bold text-secondary text-uppercase">Primary Mobile Number</Form.Label>
+                          <Form.Label className="very-small fw-bold">Primary Mobile Number</Form.Label>
                           <InputGroup className="mb-4">
-                              <Form.Control isInvalid={!!errors.mobileNumber} name="mobileNumber" value={formData.mobileNumber} placeholder="Enter 10-digit Mobile" className="bg-white" onChange={handleChange} />
-                              <Button variant="primary" type="button" className="fw-bold" onClick={handleGenerateOTP}>SEND OTP</Button>
+                              <Form.Control isInvalid={!!errors.mobileNumber} name="mobileNumber" value={formData.mobileNumber} placeholder="Enter 10-digit Mobile" onChange={handleChange} />
+                              <Button variant="outline-primary" onClick={handleGenerateOTP} type="button">Get OTP</Button>
                               <Form.Control.Feedback type="invalid">{errors.mobileNumber}</Form.Control.Feedback>
                           </InputGroup>
-                          <Form.Label className="very-small fw-bold text-secondary text-uppercase">Verification OTP</Form.Label>
-                          <Form.Control isInvalid={!!errors.otp} name="otp" value={formData.otp} className="bg-white mb-4" placeholder="Enter 6-digit OTP" onChange={handleChange} />
+                          
+                          <Form.Label className="very-small fw-bold">Verification OTP</Form.Label>
+                          <Form.Control isInvalid={!!errors.otp} name="otp" value={formData.otp} className="mb-1" placeholder="Enter 6-digit OTP" onChange={handleChange} />
                           <Form.Control.Feedback type="invalid">{errors.otp}</Form.Control.Feedback>
+                          <div className="text-muted very-small mt-2">Click 'Get OTP' to simulate a code.</div>
                       </div>
                     </Col>
                   </Row>
@@ -531,6 +527,7 @@ function SavingAccount() {
               )}
 
               {submitError && ( <Alert variant="danger" className="mb-3">{submitError}</Alert> )}
+              
               <div className="d-flex justify-content-between align-items-center mt-5 pt-4 border-top">
                 <Button type="button" variant="link" className={`text-decoration-none fw-bold ${step === 1 ? 'invisible' : 'text-secondary'}`} onClick={back}>
                   <i className="bi bi-arrow-left me-2"></i>PREVIOUS
@@ -552,7 +549,7 @@ function SavingAccount() {
         </Card.Body>
       </Card>
       <style>{`
-        .fw-black { font-weight: 900; }
+        .fw-black{ font-weight: 900; }
         .very-small { font-size: 0.65rem; letter-spacing: 0.5px; }
         .form-control, .form-select { border: 1.5px solid ${theme.border}; border-radius: 12px; font-size: 0.9rem; padding: 0.6rem 1rem; }
         .form-control:focus { border-color: ${theme.primary}; box-shadow: 0 0 0 0.25rem rgba(2, 132, 199, 0.1); }
@@ -562,4 +559,4 @@ function SavingAccount() {
   );
 }
 
-export default SavingAccount;
+export default CurrentAccount;

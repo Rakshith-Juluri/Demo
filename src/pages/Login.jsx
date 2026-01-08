@@ -161,6 +161,10 @@ function Login() {
                   background: 'transparent' // Force transparency
                 }} 
               />
+
+              <h3 className="fw-black mt-4" style={{ color: theme.darkBlue, fontWeight: 900 }}>Digi Bank</h3>
+              <p className="text-secondary opacity-75">Multi-factor encrypted authentication for your safety.</p>
+
             </div>
           </div>
 
