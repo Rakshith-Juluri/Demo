@@ -8,9 +8,9 @@ const API_BASE = 'http://localhost:4001';
 const Profile = ({ userData }) => {
   const [formData, setFormData] = useState({
     customerId: 'CUST-882910',
-    pancard: 'ABCDE1234F',
-    firstName: 'John',
-    lastName: 'Doe',
+    aadhar: 'ABCDE1234F',
+    firstName: '',
+    lastName: '',
     aadhar: '',
     email: '',
     phone: '',
@@ -59,7 +59,7 @@ const Profile = ({ userData }) => {
     // 3) Otherwise, try to hydrate from loggedInUser and API (best-effort)
     (async () => {
       let base = {};
-      try {
+      try { 
         const raw = localStorage.getItem('loggedInUser');
         if (raw) base = JSON.parse(raw) || {};
       } catch {}

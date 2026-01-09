@@ -10,9 +10,7 @@ const AccountsPage = () => {
   const [showStatusTracker, setShowStatusTracker] = useState(false);
   
   // State for active/approved accounts
-  const [accounts, setAccounts] = useState([
-    { id: 1, type: "Savings", bank: "Sky Bank", balance: "45,250.00", accNo: "6621 0082 4582", ifsc: "SKYB00012", status: "Active", branch: "Main Corporate" },
-  ]);
+  const [accounts, setAccounts] = useState([]);
 
   // State for pending application requests
   const [pendingRequests, setPendingRequests] = useState([]);
@@ -25,35 +23,67 @@ const AccountsPage = () => {
   };
 
   useEffect(() => {
-    const fetchAccountData = async () => {
+    const fetchForLoggedInUser = async () => {
+      // Resolve logged-in user id from localStorage
+      let userId = null;
       try {
-        const res = await fetch("http://localhost:4001/accountRequests");
-        if (res.ok) {
-          const allData = await res.json();
-          
-          const approved = allData
-            .filter(item => item.status === "approved")
-            .map(item => ({
-              id: item.id,
-              type: item.accountype === 'saving' ? "Savings" : "Current",
-              bank: "Sky Bank",
-              balance: "0.00",
-              accNo: item.accountNumber || "Wait...",
-              ifsc: "SKYB00012",
-              status: "Active",
-              branch: "Main Corporate"
-            }));
-          
-          setAccounts(prev => [...prev.filter(a => a.id === 1), ...approved]);
+        const raw = localStorage.getItem('loggedInUser');
+        if (raw) userId = JSON.parse(raw).id;
+      } catch (e) {
+        console.warn('Failed to parse loggedInUser from localStorage');
+      }
 
-          const pending = allData.filter(item => item.status === "pending");
-          setPendingRequests(pending);
-        }
+      if (!userId) {
+        console.warn('No logged-in user id found; skipping accounts fetch');
+        return;
+      }
+
+      try {
+        // Fetch accounts filtered by userId OR customerId (support both schemas)
+        const [accByUserRes, accByCustomerRes, pendingRes] = await Promise.all([
+          fetch(`http://localhost:4001/accounts?userId=${encodeURIComponent(userId)}`),
+         
+          fetch(`http://localhost:4001/accountRequests?userId=${encodeURIComponent(userId)}`)
+        ]);
+
+        const accByUser = accByUserRes.ok ? await accByUserRes.json() : [];
+       
+        const combined = [...accByUser];
+
+        // Deduplicate by id if present, else by accountNumber
+        const seen = new Set();
+        const merged = combined.filter(acc => {
+          const key = acc.id || acc.accountNumber || `${acc.accountType}-${acc.customerId || acc.userId}`;
+          if (seen.has(key)) return false;
+          seen.add(key);
+          return true;
+        });
+
+        const mappedAccounts = merged.map(item => ({
+          id: item.id || item.accountNumber || `${userId}-${item.accountType || 'savings'}`,
+          type: ((item.accountType || (item.displayName && item.displayName.toLowerCase().includes('savings') ? 'savings' : 'current')) === 'current') ? 'Current' : 'Savings',
+          bank: 'Sky Bank',
+          balance: typeof item.balance === 'number' ? item.balance.toLocaleString('en-IN', { minimumFractionDigits: 2 }) : (item.balance || '0.00'),
+          accNo: item.accountNumber || item.displayName || '**** **** ****',
+          ifsc: item.ifsc || 'SKYB00012',
+          status: (item.status || 'Active'),
+          branch: item.branch || 'Main Corporate'
+        }));
+
+        setAccounts(prev => {
+          const keepDefault = prev.filter(a => a.id === 1); // preserve demo card if present
+          return [...keepDefault, ...mappedAccounts];
+        });
+
+        // Pending requests only for this user
+        const pendingList = pendingRes.ok ? await pendingRes.json() : [];
+        setPendingRequests(pendingList.filter(item => item.status === 'pending'));
       } catch (err) {
-        console.error("Error connecting to JSON server:", err);
+        console.error('Error fetching user accounts:', err);
       }
     };
-    fetchAccountData();
+
+    fetchForLoggedInUser();
   }, []);
 
   const transactions = [

@@ -109,13 +109,42 @@ function SavingAccount() {
       }
 
       try {
-        const res = await fetch(`http://localhost:4001/accountRequests?userId=${loggedUserId}&accountype=saving`);
-        const data = await res.json();
-        const existing = data.find(req => req.status === 'pending' || req.status === 'accepted');
-        
-        if (existing) {
+        // Fetch both accounts and requests for savings to decide rendering
+        const [accByUserRes, accByCustomerRes, reqRes] = await Promise.all([
+          fetch(`http://localhost:4001/accounts?userId=${encodeURIComponent(loggedUserId)}`),
+          fetch(`http://localhost:4001/accounts?customerId=${encodeURIComponent(loggedUserId)}`),
+          fetch(`http://localhost:4001/accountRequests?userId=${encodeURIComponent(loggedUserId)}&accountype=saving`)
+        ]);
+
+        const accountsByUser = accByUserRes.ok ? await accByUserRes.json() : [];
+        const accountsByCustomer = accByCustomerRes.ok ? await accByCustomerRes.json() : [];
+        const accounts = [...accountsByUser, ...accountsByCustomer];
+        const requests = reqRes.ok ? await reqRes.json() : [];
+
+        // Active savings account exists
+        const hasActiveSavings = accounts.some(acc => {
+          const type = String(acc.accountType || acc.accountype || '').toLowerCase();
+          const status = String(acc.status || '').toLowerCase();
+          return (type === 'savings' || type === 'saving') && status === 'active';
+        });
+
+        if (hasActiveSavings) {
           setHasExistingAccount(true);
-          setExistingStatus(existing.status);
+          setExistingStatus('active');
+        } else {
+          // Otherwise check for a savings request in pending/accepted/approved
+          const existingReq = requests.find(req => {
+            const s = String(req.status || '').toLowerCase();
+            return s === 'pending' || s === 'accepted' || s === 'approved';
+          });
+
+          if (existingReq) {
+            setHasExistingAccount(true);
+            setExistingStatus(String(existingReq.status || 'pending').toLowerCase());
+          } else {
+            setHasExistingAccount(false);
+            setExistingStatus('');
+          }
         }
       } catch (err) {
         console.error("Validation error:", err);

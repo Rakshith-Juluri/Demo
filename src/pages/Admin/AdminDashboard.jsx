@@ -10,6 +10,7 @@ import Loans from './components/Loans';
 import Fraud from './components/Fraud';
 import { Check } from 'lucide-react';
 import { theme } from './theme';
+const API = 'http://localhost:4001';
 
 const AdminDashboard = () => {
   const [activeView, setActiveView] = useState('overview');
@@ -29,42 +30,132 @@ const AdminDashboard = () => {
   ]);
 
   useEffect(() => {
-    fetch('http://localhost:4001/users')
-      .then(res => res.json())
-      .then(usersData => {
-        const pending = []; const approved = []; const rejected = [];
-        usersData.forEach(user => {
-          if (Array.isArray(user.accountRequests)) {
-            user.accountRequests.forEach(req => {
-              const obj = {
-                id: req.requestId || `${user.id}-${req.createdAt}`,
-                requestId: req.requestId,
-                userId: user.id,
-                name: user.name || user.username || 'Unknown',
-                type: req.accountType === 'current' ? 'Current' : 'Savings',
-                reason: user.occupation || '',
-                date: new Date(req.createdAt).toLocaleDateString(),
-                raw: req,
-              };
-              if (req.status === 'pending') pending.push(obj);
-              else if (req.status === 'approved') approved.push(obj);
-              else if (req.status === 'rejected') rejected.push(obj);
-            });
-          }
+    const fetchData = async () => {
+      try {
+        const [reqRes, usersRes] = await Promise.all([
+          fetch(`${API}/accountRequests`),
+          fetch(`${API}/users`)
+        ]);
+
+        const reqs = reqRes.ok ? await reqRes.json() : [];
+        const usersList = usersRes.ok ? await usersRes.json() : [];
+        const userById = new Map((usersList || []).map(u => [String(u.id), u]));
+
+        const pending = [];
+        const approved = [];
+        const rejected = [];
+
+        (reqs || []).forEach(req => {
+          const u = userById.get(String(req.userId)) || {};
+          const item = {
+            id: req.id || req.requestId,
+            requestId: req.requestId || req.id,
+            userId: req.userId,
+            name: u.name || u.username || 'Unknown',
+            type: (req.accountype || req.accountType || '').toLowerCase() === 'current' ? 'Current' : 'Savings',
+            reason: u.occupation || '',
+            date: req.createdAt ? new Date(req.createdAt).toLocaleDateString() : '',
+            raw: req,
+          };
+          if (req.status === 'pending') pending.push(item);
+          else if (req.status === 'approved' || req.status === 'accepted') approved.push(item);
+          else if (req.status === 'rejected') rejected.push(item);
         });
-        setOpenReqs(pending); setApprovedReqs(approved); setRejectedReqs(rejected);
-        setUsers(usersData.map(u => ({
-          id: u.id, name: u.name || u.username, balance: u.balance || 0,
-          status: u.accountRequests?.some(r => r.status === 'approved') ? 'Active' : 'Pending'
+
+        setOpenReqs(pending);
+        setApprovedReqs(approved);
+        setRejectedReqs(rejected);
+
+        const approvedUserIds = new Set(approved.map(a => String(a.userId)));
+        setUsers((usersList || []).map(u => ({
+          id: u.id,
+          name: u.name || u.username || 'Unknown',
+          balance: u.balance || 0,
+          status: approvedUserIds.has(String(u.id)) ? 'Active' : 'Pending'
         })));
-      });
+      } catch (e) {
+        console.error('Failed to load admin data', e);
+      }
+    };
+
+    fetchData();
   }, [notification]);
 
   const triggerAction = (item, action, category) => setConfirmData({ ...item, action, category });
 
-  const handleFinalConfirm = () => {
-    setNotification({ msg: `Action ${confirmData.action.toUpperCase()} processed successfully`, type: 'success' });
-    setConfirmData(null);
+  const generateAccountNumber = (type) => {
+    const prefix = (type || '').toLowerCase() === 'current' ? 'CUR' : 'SAV';
+    const rand = Math.floor(100000 + Math.random() * 900000);
+    return `${prefix}${Date.now().toString().slice(-6)}${rand}`;
+  };
+
+  const resolveRequestRecordId = async (reqLike) => {
+    // Prefer json-server id if present
+    if (reqLike?.id) return reqLike.id;
+    // Fallback: look up by requestId
+    if (reqLike?.requestId) {
+      try {
+        const res = await fetch(`${API}/accountRequests?requestId=${encodeURIComponent(reqLike.requestId)}`);
+        if (res.ok) {
+          const arr = await res.json();
+          if (Array.isArray(arr) && arr[0]?.id) return arr[0].id;
+        }
+      } catch {}
+    }
+    return null;
+  };
+
+  const handleFinalConfirm = async () => {
+    const data = confirmData;
+    if (!data) return;
+
+    try {
+      if ((data.category === 'open' || data.category === 'requests') && data.raw) {
+        const req = data.raw;
+        const recordId = await resolveRequestRecordId(req);
+
+        if (data.action === 'approve') {
+          // 1) Create a new bank account for the user
+          const accountPayload = {
+            userId: data.userId,
+            accountType: (req.accountype || req.accountType || (data.type === 'Current' ? 'current' : 'savings')).toLowerCase(),
+            accountNumber: generateAccountNumber(req.accountype || req.accountType),
+            balance: 0,
+            status: 'Active',
+            createdAt: new Date().toISOString(),
+          };
+          await fetch(`${API}/accounts`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(accountPayload)
+          });
+
+          // 2) Mark request approved
+          if (recordId) {
+            await fetch(`${API}/accountRequests/${recordId}`, {
+              method: 'PATCH',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ status: 'approved', approvedAt: new Date().toISOString() })
+            });
+          }
+        } else if (data.action === 'reject') {
+          if (recordId) {
+            await fetch(`${API}/accountRequests/${recordId}`, {
+              method: 'PATCH',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ status: 'rejected', rejectedAt: new Date().toISOString() })
+            });
+          }
+        }
+      }
+
+      setNotification({ msg: `Action ${confirmData.action.toUpperCase()} processed successfully`, type: 'success' });
+    } catch (err) {
+      console.error('Action failed', err);
+      setNotification({ msg: `Action failed: ${err.message || 'Unknown error'}`, type: 'error' });
+    } finally {
+      setConfirmData(null);
+    }
   };
 
   return (
